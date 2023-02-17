@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css'%}">
+        <title>Document</title>
+    </head>
+    <body>
+        <!-- 添加项目 -->
+        <div id="projection_add">
+            <form novalidate class="layui-form" action="/projection_edit/{{id}}" method="post">
+                {% csrf_token %}
+                {% for item in form %}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ item.label }}</label>
+                    <div class="layui-input-block">
+                        {{item}}
+                        <span style="color: red;">{{ item.errors.0 }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script>
+        </script>
+    </body>
+</html>

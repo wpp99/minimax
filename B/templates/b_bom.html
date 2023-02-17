@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="../static/imgs/favicon.ico">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <!-- <span id="pro_no"> {{pro_no}} </span>   -->
+                <a class="layui-btn layui-btn-primary" id="pro_no">{{pro_no}}</a> 
+                <a class="layui-btn layui-btn-primary" id="bsystem">{{bsystem}}</a> 
+
+                <a class="layui-btn" id="add_material">添加</a>
+                <div class="search layui-inline">
+                    <div class="layui-input-inline" style="width: 200px;">
+                        <input id="bom_search_text" type="text" name="title" placeholder="批次|产品编码|存货编码" class="layui-input">
+                    </div>
+                    <a class="layui-btn layui-btn-warm" id="bom_search">筛选</a>
+                </div>
+                <!-- <span id="bsystem">{{bsystem}}</span> -->
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-hide" id="demo" lay-filter="test"></table>
+            </div>
+        </div>
+
+
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" id="bom_edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" id="bom_delete" lay-event="delete">删除</a>
+        </script>
+        <script type="text/html" id="temp1">
+            {% verbatim %}
+            
+            <!-- <a href="/detail/{{d.id}}" class="layui-table-link">{{d.num}}</a> -->
+            <!-- {{#  layui.each(d.list, function(index, item){ }}
+                <li>
+                <span>{{ item.modname }}</span>
+                <span>{{ item.alias }}：</span>
+                <span>{{ item.site || '' }}</span>
+                </li>
+            {{#  }); }}
+            {{#  if(d.list.length === 0){ }}
+                无数据
+            {{#  } }}  -->
+           
+            {% endverbatim %}
+        </script>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script src="{% static 'js/bom.js' %}"></script>
+
+    </body>
+</html>

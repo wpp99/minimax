@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>Document</title>
+        <style>
+            .file_path{
+                color: cornflowerblue;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="layui-card">
+            <div class="layui-card-header">
+                {% if path_info == "/threemeeting" %}
+                <button class="layui-btn apply">申请</button>
+                {% endif %}
+
+                {%if path_info == "/threemeeting/onpurchase" %}
+                <button class="layui-btn extract">提取数据</button>
+                {% endif %}
+                
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-hide" id="demo" lay-filter="test"></table>
+            </div>
+        </div>
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" id="meet_edit" lay-event="edit">编辑</a>
+            <!-- <a class="layui-btn layui-btn-normal layui-btn-xs" id="meet_edit" lay-event="close">申请关闭</a> -->
+            <a class="layui-btn layui-btn-danger layui-btn-xs" id="meet_delete" lay-event="delete">删除</a>
+        </script>
+
+        <script type="text/html" id="temp1">
+            {% verbatim %}
+            <a href="javascript:;" data-url="{{d.meet_sign_filepath}}" class="file_path" >{{d.meet_sign_filepath}}</a>
+            {% endverbatim %}
+        </script>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script src="{% static 'js/threemeeting.js' %}"></script>
+        
+    </body>
+</html>

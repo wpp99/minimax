@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <style>
+            .search{
+                margin-left: 50px;
+            }
+            .detail{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                border-bottom: 1px rgb(65, 70, 73) solid;
+            }
+            .detail:nth-child(even){
+                background-color: rgb(240, 255, 254);
+            }
+            .detail a{
+                display: inline-block;
+                text-align: center;
+                align-self: center;
+            }
+            .detail_head a{
+                font-weight: 300;
+                background-color: aliceblue;
+            }
+            .detail .pro_no{
+                width: 150px;
+            }
+            .detail .system, .detail .bc_sum{
+                width: 100px;
+            }
+            .detail .bc{
+                width: 500px;
+                display: flex;
+                flex-direction: column;
+            }
+        </style>
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <button class="layui-btn" id="bom_sum">bom汇总</button>
+            </div>
+            <div class="layui-card-body main_body" data-count="{{count}}">
+                <table class="layui-table" id="demo" lay-filter="demo">
+                    <!-- <colgroup>
+                        <col width="120">
+                        <col width="120">
+                        <col width="120">
+                        <col >
+                        <col width="120">
+                      </colgroup> -->
+                    <thead>
+                        <tr>
+                            <th lay-data="{field:'no', width:120}">序号</th>
+                            <th lay-data="{field:'product_code', width:120}">产品编码</th>
+                            <th lay-data="{field:'inventory_code', width:100}">存货编码</th>
+                            <th lay-data="{field:'inventory_code', width:80}">总数量</th>
+                            <th lay-data="{field:'detail', templet: '#titleTpl'}">详情</th>
+                            <th lay-data="{field:'submit_date', width:120}">提取日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for d in datas%}
+                        <tr>
+                            <td>3</td>
+                            <td>{{d.product_code}}</td>
+                            <td>{{d.inventory_code}}</td>
+                            <td>{{d.total_sum}}</td>
+                            <td>
+                                <li class="detail detail_head">
+                                    <a class="pro_no">项目号</a>
+                                    <a class="system">系统</a>
+                                    <a class="number">数量</a>
+                                    <a class="bc">批次</a>
+                                </li>
+                                {%for item in d.pro_sys_bc %}
+                                <li class="detail">
+                                    <a class="pro_no">{{item.pro_no}}</a>
+                                    <a class="system">{{item.m_system}}</a>
+                                    <a class="bc_sum">{{item.bc_sum}}</a>
+                                    <a class="bc">
+                                        {%for batch, num in item.bc.items %}
+                                            <span class="batch_num">{{batch}}: {{num}}</span>
+                                        {%endfor%}
+                                    </a>
+                                </li>
+                                {%endfor%}
+                                
+                                
+                            </td>
+                            <td>{{d.submit_date}}</td>
+                        </tr> 
+                        {%endfor%}     
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="page"></div>
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn layui-btn-xs" id="projection_b"  lay-event="btable" href="javascript:;">b表</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" id="projection_edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" id="projection_delete" lay-event="delete">删除</a>
+        </script>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script>
+            var table = layui.table;
+            var $ = layui.$;
+            var loadIndex;
+            var count = $(".main_body").attr("data-count");
+            
+            $("#bom_sum").click(function(){
+                $.ajax({
+                    method: "GET",
+                    url: "/bominterface/bom_submit",
+                    beforeSend: function(){
+                        loadIndex = layer.load(1, {
+                            shade: [0.1, "#fff"]
+                        });
+                    },
+                    complete: function(){
+                        layer.close(loadIndex);
+                    },
+                    success: function(res){
+                        layer.msg(res.msg);
+                        if (res.code == 0){
+                            document.location = "/bominterface/bom_all?page=1&limit=10"
+                        }
+                    }
+                })
+            });
+            
+            layui.use('laypage', function(){
+                var laypage = layui.laypage;
+                
+                //执行一个laypage实例
+                laypage.render({
+                    elem: 'page' // ID，不用加 # 号
+                    ,count: count 
+                    ,limit: 10
+                    ,limits: [10, 20, 30, 50]
+                    ,layout: ['prev', 'skip', 'page', 'next', 'limit']
+                    ,jump: function(obj, first){
+                        //首次不执行
+                        if(!first){
+                        //do something
+                            $.ajax({
+                                type: "GET",
+                                url: "/bominterface/bom_all",
+                                data: {
+                                    page: obj.curr,
+                                    limit: obj.limit,
+                                },
+                                beforeSend: function(){
+                                    loadIndex = layer.load(1, {
+                                        shade: [0.1, "#fff"]
+                                    });
+                                },
+                                complete: function(){
+                                    layer.close(loadIndex);
+                                },
+                                success: function(res){
+                                    var reg = /<table.*?>[\s\S]*?<\/table>/mg;
+                                    table_res = reg.exec(res)[0];
+                                    $(".main_body").html(table_res);
+                                    // $(document.getElementsByTagName("iframe")).html(res);
+                                }
+                            })
+                        }
+                    }
+                    
+                });
+            }); 
+        </script>
+
+    </body>
+</html>

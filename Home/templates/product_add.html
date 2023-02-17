@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>product add</title>
+    </head>
+    <body>
+        <div id="product_add">
+            {% comment %} <button class="layui-btn layui-btn-primary pro_system">{{pro_system}}</button> {% endcomment %}
+            <form class="layui-form pro_system" action="/product/add/{{pro_system}}" id="{{pro_system}}" method="post" product_code="{{product_code}}">
+                {% csrf_token %}
+                {% for item in form %}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ item.label }}</label>
+                    <div class="layui-input-block">
+                        {{item}}
+                        <span style="color: red;">{{ item.errors.0 }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script src="{% static 'plugins/layui/layui.js' %} "></script>
+        <script>
+            var $ = layui.$;
+            // 生成产品编码
+            $("#id_product_code").val($(".pro_system").attr("product_code"));
+            // 默认选中所属系统
+            var pro_system = $(".pro_system").attr('id'); 
+            $("select").find("option:contains("+pro_system+")").attr("selected",true); 
+        </script>
+        
+    </body>
+</html>

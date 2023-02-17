@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>minimax_b</title>
+    </head>
+
+
+    <body>
+        <div class="layui-layout layui-layout-admin">
+            <div class="layui-header">
+                <div class="layui-logo layui-hide-xs layui-bg-black">minimax</div>
+                <!-- 头部区域 -->
+                <ul class="layui-nav layui-layout-left">
+                    <!-- 移动端显示 -->
+                    <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+                        <i class="layui-icon layui-icon-spread-left"></i>
+                    </li>
+                    <li class="layui-nav-item layui-hide-xs"><a class="upload_link" href="/upload">上传</a></li>
+                    <li class="layui-nav-item layui-hide-xs"><a class="upload_link" href="/notice">通知</a></li>
+                    <li class="layui-nav-item layui-hide-xs"><a class="upload_link" href="">nav 3</a></li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">nav groups</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="">menu 11</a></dd>
+                            <dd><a href="">menu 22</a></dd>
+                            <dd><a href="">menu 33</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+
+                <ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                        <a href="javascript:;">
+                            <img src="" class="layui-nav-img"> 
+                            tester
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="">Your Profile</a></dd>
+                            <dd><a href="">Settings</a></dd>
+                            <dd><a href="">Sign out</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                        <a href="javascript:;">
+                            <i class="layui-icon layui-icon-more-vertical"></i>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div class="layui-side layui-bg-black">
+                <div class="layui-side-scroll">
+                    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                    <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                        <li class="layui-nav-item layui-nav-itemed" id="item1"><a class="" href="/projection">项目</a></li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">产品</a>
+                            <dl class="layui-nav-child">
+                                <dd><a href="/product/prosystem/all">all</a></dd>
+                                <dd><a href="/product/prosystem/SGY01">SGY01</a></dd>
+                                <dd><a href="/product/prosystem/SGY02">SGY02</a></dd>
+                                <dd><a href="/product/prosystem/SGY03">SGY03</a></dd>
+                                <dd><a href="/product/prosystem/SGCE">SGCE</a></dd>
+                                <dd><a href="/product/prosystem/WNozzle">WNozzle</a></dd>
+                                <dd><a href="/product/prosystem/SGF">SGF</a></dd>
+                                <dd><a href="/product/prosystem/SGK10">SGK10</a></dd>
+                                <dd><a href="/product/prosystem/SGK30">SGK30</a></dd>
+                                <dd><a href="/product/prosystem/SGK40">SGK40</a></dd>
+                                <dd><a href="/product/prosystem/SGJ10">SGJ10</a></dd>
+                                <dd><a href="/product/prosystem/SGJ20">SGJ20</a></dd>
+                                <dd><a href="/product/prosystem/GasNozzle">GasNozzle</a></dd>
+                                <dd><a href="/product/prosystem/SGA10">SGA10</a></dd>
+                                <dd><a href="/product/prosystem/SGA20">SGA20</a></dd>
+                                <dd><a href="/product/prosystem/SGA30">SGA30</a></dd>
+                                <dd><a href="/product/prosystem/SGP">SGP</a></dd>
+                                <dd><a href="/product/prosystem/WaterPiping">WaterPiping</a></dd>
+                                <dd><a href="/product/prosystem/GasPiping">GasPiping</a></dd>
+                                <dd><a href="/product/prosystem/Supports">Supports</a></dd>
+                                <dd><a href="/product/prosystem/InstAcc">InstAcc</a></dd>
+                            </dl>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">三部会审</a>
+                            <dl class="layui-nav-child">
+                                <dd><a href="/threemeeting">申请</a></dd>
+                                <dd><a href="/threemeeting/thistime">本次</a></dd>
+                                <dd><a href="/threemeeting/onpurchase">待采购</a></dd>
+                                <!-- <dd><a href="/threemeeting/not_start">未开始</a></dd> -->
+                            </dl>
+                        </li>
+                        <li class="layui-nav-item">
+                            <a href="javascript:;">bom周界面</a>
+                            <dl class="layui-nav-child">
+                                <dd><a href="/bominterface/ALL1nz">1nzAll</a></dd>
+                                <dd><a href="/bominterface/sjXqdall">sjXQDALL</a></dd>
+                                <dd><a href="/bominterface/bom_all?page=1&limit=10">bom汇总</a></dd>
+                                <dd><a href="/bominterface/yongyou">用友</a></dd>
+                                <dd><a href="/bominterface/batch_compart">批次对比表</a></dd>
+                                <dd><a href="/guan">固安</a></dd>
+                                <dd><a href="/bominterface/material_out">材料出库单列表</a></dd>
+                            </dl>
+                        </li>
+
+                        <li class="layui-nav-item"><a href="/test">test</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="layui-body">
+                <!-- 内容主体区域 -->
+                <iframe src="/projection" width="100%" scrolling="yes" height="100%" style="z-index: 1;" frameborder="0"></iframe>
+            </div>
+
+            <div class="layui-footer">
+                底部固定区域
+            </div>
+        </div>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script src="{% static 'plugins/jquery-3.6.3.min.js' %}"></script>
+        <script>
+            $(".layui-nav-item a, .upload_link").click(function (e) {
+                e.preventDefault();
+                $('iframe').attr('src', $(this).attr('href'));
+            });
+        </script>
+    </body>
+</html>

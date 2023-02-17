@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <style>
+            
+        </style>
+        <title>Document</title>
+    </head>
+    <body>
+        
+        
+               
+        
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn layui-btn-xs" id="projection_b"  lay-event="btable" href="javascript:;">b表</a>
+            <a class="layui-btn layui-btn-normal layui-btn-xs" id="projection_edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" id="projection_delete" lay-event="delete">删除</a>
+        </script>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <script>
+            var table = layui.table;
+            var $ = layui.$;
+            
+        </script>
+
+    </body>
+</html>

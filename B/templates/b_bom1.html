@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="../static/imgs/favicon.ico">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <!-- <span id="pro_no"> {{pro_no}} </span>   -->
+                <a class="layui-btn layui-btn-primary" id="pro_no">{{pro_no}}</a> 
+                <a class="layui-btn layui-btn-primary" id="bsystem">{{bsystem}}</a> 
+
+                <a class="layui-btn" id="add_material">添加</a>
+                <!-- <span id="bsystem">{{bsystem}}</span> -->
+            </div>
+            <div class="layui-card-body">
+                <table class="layui-table" id="demo" lay-filter="test">
+                    <thead>
+                        <colgroup>
+                            <col width="150">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                     
+                            
+                        </colgroup>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th
+                            <th></th>
+                            
+                            <th colspan="{{heads.bb|length}}">设计量</th>
+                            <th colspan="{{heads.bc|length}}">订货量</th>
+                            <th colspan="{{heads.bd|length}}">发货量</th>
+                            <th colspan="{{heads.be|length}}">到货量</th>
+                            <th>操作</th>
+                           
+                        </tr>
+                        <tr>
+                            <th>产品编码</th>
+                            <th>存货编码</th>
+                            <th>名称</th>
+                            <th>型号</th>
+                            <th>所属系统</th>
+                            <th>供应商</th>
+                            {% for bb_key in heads.bb %}
+                                <th>{{bb_key}}</th>
+                            {% endfor %}
+                            {% for bc_key in heads.bc %}
+                                <th>{{bc_key}}</th>
+                            {% endfor %}
+                            {% for bd_key in heads.bd %}
+                                <th>{{bd_key}}</th>
+                            {% endfor %}
+                            {% for be_key in heads.be %}
+                                <th>{{be_key}}</th>
+                            {% endfor %}
+                            
+                            
+                        </tr>
+                        {% for item in data %}
+                        <tr>
+                            <td>{{item.product_code}}</td>
+                            <td>{{item.inventory_code}}</td>
+                            <td>{{item.product_name}}</td>
+                            <td>{{item.product_type}}</td>
+                            <td>{{item.m_system}}</td>
+                            <td>{{item.supply}}</td>
+                            {%for v in item.bb %}
+                            <td>{{v}}</td>
+                            {% endfor %}
+                            {%for v in item.bc %}
+                            <td>{{v}}</td>
+                            {% endfor %}
+                            {%for v in item.bd %}
+                            <td>{{v}}</td>
+                            {% endfor %}
+                            {%for v in item.be %}
+                            <td>{{v}}</td>
+                            {% endfor %}
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <a class="layui-btn layui-btn-normal layui-btn-xs" id="bom_edit" lay-event="edit">编辑</a>
+                                <a class="layui-btn layui-btn-danger layui-btn-xs" id="bom_delete" lay-event="delete">删除</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-normal layui-btn-xs" id="bom_edit" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" id="bom_delete" lay-event="delete">删除</a>
+        </script>
+        <script src="{% static 'plugins/layui/layui.js' %}"></script>
+        <!-- <script src="{% static 'js/bom.js' %}"></script> -->
+
+    </body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <title>Document</title>
+    </head>
+    <body>
+        <!-- 添加项目 -->
+        <div id="projection_add">
+            
+            <form class="layui-form" action="/b/bom/add/{{ pro_no }}/{{bsystem}}" method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.pro_no.label }}</label>
+                    <div class="layui-input-block pro_no" id="{{pro_no}}">
+                        {{form.pro_no}}
+                        <span style="color: red;">{{ form.pro_no.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.product_code.label }}</label>
+                    <div class="layui-input-block" id="material_no_input">
+                        <span id="material_type" style="color: red;"></span>
+                        {{form.product_code}}
+                        <span style="color: red;">{{ form.product_code.errors.0 }}</span>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.inventory_code.label }}</label>
+                    <div class="layui-input-block" id="material_no_input">
+                        <span id="material_type" style="color: red;"></span>
+                        {{form.inventory_code}}
+                        <span style="color: red;">{{ form.product_code.errors.0 }}</span>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.m_system.label }}</label>
+                    <div class="layui-input-block bsystem" id="{{bsystem}}">
+                        {{form.m_system}}
+                        <span style="color: red;">{{ form.m_system.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.ba.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.ba}}
+                        <span style="color: red;">{{ form.ba.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                
+               
+                <!-- bb -->
+                <div class="layui-inline layui-form-item">
+                    <label class="layui-form-label">添加设计量</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bb_house" placeholder="房间" autocomplete="off" class="layui-input m-1">
+                    </div>
+                    <!-- <div class="layui-form-label">数量</div> -->
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bb_num" placeholder="数量" autocomplete="off" class="layui-input m-2">
+                    </div>
+
+                    <a class="layui-btn m-add">增加bb</a>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bb.label }}</label>
+                    <div class="layui-input-block m-to">
+                        {{form.bb}}
+                        <span style="color: red;">{{ form.bb.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!--bb-con-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bb_con.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.bb_con}}
+                        <span style="color: red;">{{ form.bb_con.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+
+                <!--bb-res-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bb_res.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.bb_res}}
+                        <span style="color: red;">{{ form.bb_res.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+
+                <!-- bc -->
+                <div class="layui-inline layui-form-item">
+                    <label class="layui-form-label">增加采购量</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bc_batch" placeholder="批次" autocomplete="off" class="layui-input m-1" id="bc_batch">
+                    </div>
+                    <!-- <div class="layui-form-mid">数量</div> -->
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bc_num" placeholder="数量" autocomplete="off" class="layui-input m-2">
+                    </div>
+                    <a class="layui-btn m-add">增加bc</a>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bc.label }}</label>
+                    <div class="layui-input-block m-to">
+                        {{form.bc}}
+                        <span style="color: red;">{{ form.bc.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!-- bd -->
+                <div class="layui-inline layui-form-item">
+                    <label class="layui-form-label">增加发货量</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bd_house" placeholder="房间" autocomplete="off" class="layui-input m-1">
+                    </div>
+
+                    <!-- <label class="layui-form-label">数量</label> -->
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bd_num" placeholder="数量" autocomplete="off" class="layui-input m-2">
+                    </div>
+                    <a class="layui-btn m-add">增加bd</a>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bd.label }}</label>
+                    <div class="layui-input-block m-to">
+                        {{form.bd}}
+                        <span style="color: red;">{{ form.bd.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+
+                <!--be_arrive-->
+                <div class="layui-inline layui-form-item">
+                    <label class="layui-form-label">增加到货量</label>
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bd_house" placeholder="批次" autocomplete="off" class="layui-input m-1">
+                    </div>
+
+                    <!-- <label class="layui-form-label">数量</label> -->
+                    <div class="layui-input-inline" style="width: 150px;">
+                        <input type="text" name="bd_num" placeholder="数量" autocomplete="off" class="layui-input m-2">
+                    </div>
+                    <a class="layui-btn m-add">增加be</a>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.be_arrive.label }}</label>
+                    <div class="layui-input-block m-to">
+                        {{form.be_arrive}}
+                        <span style="color: red;">{{ form.be_arrive.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!--bs-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bs.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.bs}}
+                        <span style="color: red;">{{ form.bs.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!--bd2-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.bd2.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.bd2}}
+                        <span style="color: red;">{{ form.bd2.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!--be_install-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.be_install.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.be_install}}
+                        <span style="color: red;">{{ form.be_install.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+                <!--be_res-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">{{ form.be_res.label }}</label>
+                    <div class="layui-input-block">
+                        {{form.be_res}}
+                        <span style="color: red;">{{ form.be_res.errors.0 }}</span>
+                    </div>
+                    
+                </div>
+
+
+
+
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+
+
+
+        </div>
+
+        <script src="{% static 'plugins/layui/layui.js' %} "></script>
+        <script src="{% static 'plugins/jquery-3.6.3.min.js' %} "></script>
+        <script src="{% static 'js/bom_edit_add.js' %} "></script>
+        
+    </body>
+</html>
