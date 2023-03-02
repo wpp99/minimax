@@ -65,14 +65,15 @@ urlpatterns = [
     path('bominterface/yongyou', bom_interface.bom_interface),
     path('bominterface/batch_compart', bom_interface.bom_interface),
     path('bominterface/material_out', bom_interface.bom_interface),
+    path('yy/warehouse', bom_interface.bom_interface),
+    path('yy/purchase', bom_interface.bom_interface),
+    path('yy/sale_out', bom_interface.bom_interface),
     path('bominterface/getData/<str:interface>', bom_interface.get_interface_data),
-
-    path('guan', guan.guan),
+    
     path('guan/data', guan.get_guan_data),
     path('guan/add', guan.guan_add),
     path('guan/edit/<str:id>', guan.guan_edit),
     path('guan/delete/<str:id>', guan.guan_delete),
-
 
     path('projection_b/<str:pro_no>', material.meterial),
 
@@ -102,5 +103,5 @@ urlpatterns = [
 
     path('b/output', output.output),
     path('b/load', output.load_btable),
-    path('edit_inventory_code', output.add_inventory_code),
+    # path('edit_inventory_code', output.add_inventory_code),
 ]

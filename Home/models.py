@@ -46,9 +46,9 @@ class Projection(models.Model):
 class Product(models.Model):
     objects = BulkUpdateOrCreateQuerySet.as_manager()
     # 产品编码
-    product_code = models.CharField(verbose_name='产品编码', max_length=15, unique=True)
+    product_code = models.CharField(verbose_name='产品编码', max_length=30, unique=True)
     # 存货编码
-    inventory_code = models.CharField(verbose_name='存货编码', max_length=15, null=True, blank=True)
+    inventory_code = models.CharField(verbose_name='存货编码', max_length=30, null=True, blank=True)
     # 名称
     product_name = models.CharField(verbose_name='名称', max_length=255, default='', null=True, blank=True)
     # 单位
@@ -64,7 +64,7 @@ class Product(models.Model):
     # 座位号
     place_no = models.CharField(verbose_name='座位号', max_length=15, null=True, blank=True)
     # 现有库存 
-    inventory_num = models.IntegerField(verbose_name='现有库存', default=0)
+    # inventory_num = models.IntegerField(verbose_name='现有库存', default=0)
     # 备注
     # 详细描述
     detail = models.TextField(verbose_name="详细描述", null=True, blank=True)
@@ -163,75 +163,85 @@ class threePartRemark(models.Model):
 
 # 销售订单
 class SaleOrder(models.Model):
-    three_product_code = models.CharField(verbose_name="流程号", max_length=40)
-    bom = models.CharField(verbose_name="bom", max_length=30)
-    business_type = models.CharField(verbose_name="业务类型", max_length=10)
-    order_number = models.CharField(verbose_name="订单号", max_length=20)
-    prepared_by = models.CharField(verbose_name="制单人", max_length=10)
-    order_date = models.DateField(verbose_name="订单日期")
-    reviewed_by = models.CharField(verbose_name="审核人", max_length=10)
-    audit_date = models.DateField(verbose_name="审核时间")
-    close_by = models.CharField(verbose_name="关闭人", max_length=10)
-    sale_num = models.IntegerField(verbose_name="数量")
-    pre_delevery_date = models.DateField(verbose_name="预计发货日期")
-    order_sub_id = models.CharField(verbose_name="订单子表ID", max_length=20)
-    unship_num = models.IntegerField(verbose_name="未发货数量")
-    un_order = models.IntegerField(verbose_name="未下达采购")
-    close_date= models.DateField(verbose_name="关闭日期")
+    three_product_code = models.CharField(verbose_name="流程号", max_length=40, null=True, blank=True)
+    bom = models.CharField(verbose_name="bom", max_length=30, null=True, blank=True)
+    business_type = models.CharField(verbose_name="业务类型", max_length=10, null=True, blank=True)
+    order_number = models.CharField(verbose_name="订单号", max_length=20, null=True, blank=True)
+    prepared_by = models.CharField(verbose_name="制单人", max_length=10, null=True, blank=True)
+    order_date = models.DateField(verbose_name="订单日期", null=True, blank=True)
+    reviewed_by = models.CharField(verbose_name="审核人", max_length=10, null=True, blank=True)
+    audit_date = models.DateField(verbose_name="审核时间", null=True, blank=True)
+    close_by = models.CharField(verbose_name="关闭人", max_length=10, null=True, blank=True)
+    sale_num = models.IntegerField(verbose_name="数量", null=True, blank=True)
+    pre_delevery_date = models.DateField(verbose_name="预计发货日期", null=True, blank=True)
+    order_sub_id = models.CharField(verbose_name="订单子表ID", max_length=20, null=True, blank=True)
+    unship_num = models.IntegerField(verbose_name="未发货数量", null=True, blank=True)
+    un_order = models.IntegerField(verbose_name="未下达采购", null=True, blank=True)
+    close_date= models.DateField(verbose_name="关闭日期", null=True, blank=True)
 
 
 
 # 采购订单  1 3 6 9 11 13    预计入库量 Q9 
-class PurchaseOrder(models.CharField):
-    three_product_code = models.CharField(verbose_name="流程号", max_length=40)
-    order_code = models.CharField(verbose_name="订单号", max_length=30)
-    business_type = models.CharField(verbose_name="业务类型", max_length=10)
-    purchase_type = models.CharField(verbose_name="采购类型", max_length=20)
-    purchase_num = models.IntegerField(verbose_name="数量")
-    upper_order_code = models.CharField(verbose_name="上游单据号", max_length=30)
-    prepared_by = models.CharField(verbose_name="制单人", max_length=10)
-    order_date = models.DateField(verbose_name="订单日期")
-    reviewed_by = models.CharField(verbose_name="审核人", max_length=10)
-    audit_date = models.DateField(verbose_name="审核时间")
-    arrive_date = models.DateField(verbose_name="计划入库日期")
-    warehouse_status = models.CharField(verbose_name="入库状态", max_length=10)
-    remark = models.CharField(verbose_name="备注", max_length=255)
+class PurchaseOrder(models.Model):
+    three_product_code = models.CharField(verbose_name="流程号", max_length=40, null=True, blank=True)
+    pro_batch = models.CharField(verbose_name="项目批次号", max_length=30, null=True, blank=True)
+    pro_des = models.CharField(verbose_name="项目描述", max_length=255, null=True, blank=True)
+    depart = models.CharField(verbose_name="部门", max_length=10, null=True, blank=True)
+    product_code = models.CharField(verbose_name="产品编码", max_length=30, null=True, blank=True)
+    inventory_code = models.CharField(verbose_name="存货编码", max_length=30, null=True, blank=True)
+    order_code = models.CharField(verbose_name="订单号", max_length=30, null=True, blank=True)
+    business_type = models.CharField(verbose_name="业务类型", max_length=10, null=True, blank=True)
+    purchase_type = models.CharField(verbose_name="采购类型", max_length=20, null=True, blank=True)
+    purchase_num = models.IntegerField(verbose_name="数量", null=True, blank=True)
+    upper_order_code = models.CharField(verbose_name="上游单据号", max_length=30, null=True, blank=True)
+    prepared_by = models.CharField(verbose_name="制单人", max_length=10, null=True, blank=True)
+    order_date = models.DateField(verbose_name="订单日期", null=True, blank=True)
+    reviewed_by = models.CharField(verbose_name="审核人", max_length=10, null=True, blank=True)
+    audit_date = models.DateField(verbose_name="审核时间", null=True, blank=True)
+    arrive_date = models.DateField(verbose_name="计划入库日期", null=True, blank=True)
+    warehouse_status = models.CharField(verbose_name="入库状态", max_length=10, null=True, blank=True)
+    arrive_status = models.CharField(verbose_name="到货状态", max_length=20, null=True, blank=True)
+    drictship = models.CharField(verbose_name="直运至", max_length=10, null=True, blank=True)
+    cum_towarehouse_num = models.FloatField(verbose_name="累计入库数量", null=True, blank=True)
+    remark = models.CharField(verbose_name="备注", max_length=255, null=True, blank=True)
 
 
 # 库存   现存量 Q7
 class Inventory(models.Model):
     product_code = models.CharField(verbose_name="产品编码", max_length=20)
     inventory_code = models.CharField(verbose_name="存货编码", max_length=20)
-    inventory_name = models.CharField(verbose_name="存货名称", max_length=255)
+    inventory_name = models.CharField(verbose_name="存货名称", max_length=255, null=True, blank=True)
 
-    warehouse_code = models.CharField(verbose_name="仓库编码", max_length=20)
-    warehouse_name = models.CharField(verbose_name="仓库名称", max_length=100)
+    warehouse_code = models.CharField(verbose_name="仓库编码", max_length=20, null=True, blank=True)
+    warehouse_name = models.CharField(verbose_name="仓库名称", max_length=100, null=True, blank=True)
 
-    # unit = models.CharField(verbose_name="单位", max_length=10)
-    # specific_model = models.CharField(verbose_name="规格型号", max_length=255)
-
-    inven_now_num = models.IntegerField(verbose_name="现存数量")
+    inven_now_num = models.IntegerField(verbose_name="现存数量", null=True, blank=True)
     to_inventory_num = models.IntegerField(verbose_name="预计入库量", null=True, blank=True)
     inven_delivery_num = models.IntegerField(verbose_name="待发货量", null=True, blank=True)
-    inven_class_code = models.CharField(verbose_name="存货分类代码", max_length=20)
-    inven_class_name = models.CharField(verbose_name="存货分类名称", max_length=255)
-    inven_con_code = models.CharField(verbose_name="存货合同号", max_length=20)
+    inven_class_code = models.CharField(verbose_name="存货分类代码", max_length=20, null=True, blank=True)
+    inven_class_name = models.CharField(verbose_name="存货分类名称", max_length=255, null=True, blank=True)
+    inven_con_code = models.CharField(verbose_name="存货合同号", max_length=20, null=True, blank=True)
     need_flow_code = models.CharField(verbose_name="需求跟踪号", max_length=20, null=True, blank=True)
 
 
 # 销售出库订单 
 class SaleOutInventory(models.Model):
-    three_product_code = models.CharField(verbose_name="流程号", max_length=40)
-    ac_set = models.CharField(verbose_name="账套", max_length=20)
-    warehouse_code = models.CharField(verbose_name="仓库编码", max_length=20)
-    warehouse_name = models.CharField(verbose_name="仓库名称", max_length=100)
-    warehouse_out_code = models.CharField(verbose_name="出库单号", max_length=20)
-    out_num = models.IntegerField(verbose_name="数量")
-    out_date = models.DateField(verbose_name="出库日期")
-    order_code = models.CharField(verbose_name="来源订单号", max_length=20)
-    reviewed_by = models.CharField(verbose_name="审核人", max_length=10)
-    audit_date = models.DateField(verbose_name="审核时间")
-    out_type = models.CharField(verbose_name="出库类型", max_length=20)
+    three_product_code = models.CharField(verbose_name="流程号", max_length=40, null=True, blank=True)
+    pro_batch = models.CharField(verbose_name="项目批次号", max_length=30, null=True, blank=True)
+    depart = models.CharField(verbose_name="销售部门", max_length=10, null=True, blank=True)
+    product_code = models.CharField(verbose_name="产品编码", max_length=20)
+    inventory_code = models.CharField(verbose_name="存货编码", max_length=20)
+    ac_set = models.CharField(verbose_name="账套", max_length=20, null=True, blank=True)
+    warehouse_code = models.CharField(verbose_name="仓库编码", max_length=20, null=True, blank=True)
+    warehouse_name = models.CharField(verbose_name="仓库名称", max_length=100, null=True, blank=True)
+    warehouse_out_code = models.CharField(verbose_name="出库单号", max_length=20, null=True, blank=True)
+    out_num = models.IntegerField(verbose_name="数量", null=True, blank=True)
+    out_date = models.DateField(verbose_name="出库日期", null=True, blank=True)
+    order_code = models.CharField(verbose_name="来源订单号", max_length=20, null=True, blank=True)
+    prepared_by = models.CharField(verbose_name="制单人", max_length=10, null=True, blank=True)
+    reviewed_by = models.CharField(verbose_name="审核人", max_length=10, null=True, blank=True)
+    audit_date = models.DateField(verbose_name="审核时间", null=True, blank=True)
+    out_type = models.CharField(verbose_name="出库类型", max_length=20, null=True, blank=True)
 
 
 

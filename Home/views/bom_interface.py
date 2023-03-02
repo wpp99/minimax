@@ -7,12 +7,12 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from Home.models import Product, Bom_sum_record
+from Home.models import Product, Bom_sum_record, Inventory, SaleOutInventory, PurchaseOrder
 from B.models import Projection, B1nz, Boms
 from B.views.boms import del_data
 from B.views.b1nz import get_1nz_data
 from B.views.bsjxqd import get_sjxqd_data
-from B.views.common import choice_map, bom_map_inverse
+from B.views.common import choice_map, bom_map_inverse, bom_map
 
 bom_merge = {}
 bom_merge_list = []
@@ -31,17 +31,23 @@ def bom_sum(req):
     """bom_sum 页面"""
     page = int(req.GET.get('page'))
     limit = int(req.GET.get('limit'))
+    bom = req.GET.get('bom')
+
+
     start = (page - 1) * limit
     end = page * limit 
 
-    bom_sum_obj = Bom_sum_record.objects.all()
+    if bom == 'all':
+        bom_sum_obj = Bom_sum_record.objects.all()
+    else:
+        bom_sum_obj = Bom_sum_record.objects.filter(pro_sys_bc__contains=bom)
     last_date = datetime.now().strftime("%Y-%m-%d")
     if bom_sum_obj:
         last_date = bom_sum_obj.order_by("-id").first().submit_date
     
-    data_obj = Bom_sum_record.objects.filter(submit_date = last_date).order_by("-total_sum")
-    
-    return render(req, "bom_sum.html", {"datas": data_obj[start: end], "count": data_obj.count()})
+    # bom_sum_obj = bom_sum_obj.filter(submit_date=last_date).order_by("-total_sum")
+    bom_sum_obj = bom_sum_obj.order_by("-total_sum")
+    return render(req, "bom_sum.html", {"datas": bom_sum_obj[start: end], "count": bom_sum_obj.count(), "bom_name": bom_map})
 
 
 def bc_sum(d):
@@ -77,13 +83,6 @@ def get_bom_data():
                     "datas_product": [d],
                     "total_sum": total_sum
                 }
-
-    # with open("./static/bom_interface.txt", "a", encoding="utf-8") as f:
-    #     for key, value in datalist.items():
-    #         f.writelines(str(key) + "\t") 
-    #         for k, v in value.items():
-    #             f.writelines(str(k) + ":" + str(v) + "\t")
-    #         f.writelines("\n")
     return datalist
 
 
@@ -100,7 +99,7 @@ def bom_submit(req):
             pro_sys_bc = value["datas_product"],
         )
         data.append(bom_record)
-    Bom_sum_record.objects.bulk_update_or_create(data, ["pro_sys_bc", "total_sum", "submit_date"], match_field=["product_code"])
+    Bom_sum_record.objects.bulk_create(data)
     content = {
         "code": 0,
         "msg": "提取成功"
@@ -109,17 +108,87 @@ def bom_submit(req):
 
 
 def get_interface_data(req, interface):
+    
     page = int(req.GET.get('page'))
     limit = int(req.GET.get('limit'))
     start = (page - 1) * limit
     end = page * limit 
     numbers = [*range(start, end)]
 
-    json_content = {}
+    content = {
+        "code": 0,
+        "msg": "success",
+        "data": [],
+        "count": 0
+    }
+    json_content = JsonResponse(content)
     if interface == "ALL1nz":
         json_content = get_1nz_data(req, "all_1nz")
     elif interface == "sjXqdall":
         json_content = get_sjxqd_data(req, "all_sjxqd")
-    
+    elif interface == "warehouse":
+        data = [{
+            "no": i+1,
+            "product_code":x.product_code,
+            "inventory_code":x.inventory_code,
+            "inventory_name":x.inventory_name,
+            "warehouse_code":x.warehouse_code,
+            "warehouse_name":x.warehouse_name,
+            "inven_now_num":x.inven_now_num,
+            "to_inventory_num":x.to_inventory_num,
+            "inven_delivery_num":x.inven_delivery_num,
+            "inven_class_code":x.inven_class_code,
+            "inven_class_name":x.inven_class_name,
+            "inven_con_code":x.inven_con_code,
+            "need_flow_code":x.need_flow_code,
+        } for i, x in zip(numbers, Inventory.objects.all()[start:end])]
+        
+        content["data"] = data
+        content["count"] = Inventory.objects.all().count()
+        print(content)
+        json_content = JsonResponse(content)
+    elif interface == "sale_out":
+        data = [{
+            "no": i+1,
+            "three_product_code":x.three_product_code,
+            "product_code":x.product_code,
+            "inventory_code":x.inventory_code,
+            "ac_set":x.ac_set,
+            "warehouse_code":x.warehouse_code,
+            "warehouse_name":x.warehouse_name,
+            "warehouse_out_code":x.warehouse_out_code,
+            "out_num":x.out_num,
+            "out_date":x.out_date,
+            "order_code":x.order_code,
+            "reviewed_by":x.reviewed_by,
+            "audit_date":x.audit_date,
+            "out_type":x.out_type,
+        } for i, x in zip(numbers, SaleOutInventory.objects.all()[start:end])]
+        content["data"] = data
+        content["count"] = SaleOutInventory.objects.all().count()
+        json_content = JsonResponse(content)
+    elif interface == "purchase":
+        print("b")
+        data = [{
+            "no": i+1,
+            "three_product_code":x.three_product_code,
+            "product_code":x.product_code,
+            "inventory_code":x.inventory_code,
+            "order_code":x.order_code,
+            "business_type":x.business_type,
+            "purchase_type":x.purchase_type,
+            "purchase_num":x.purchase_num,
+            "upper_order_code":x.upper_order_code,
+            "prepared_by":x.prepared_by,
+            "order_date":x.order_date,
+            "reviewed_by":x.reviewed_by,
+            "audit_date":x.audit_date,
+            "arrive_date":x.arrive_date,
+            "warehouse_status":x.warehouse_status,
+            "remark":x.remark,
+        } for i, x in zip(numbers, PurchaseOrder.objects.all()[start:end])]
+        content["data"] = data
+        content["count"] = PurchaseOrder.objects.all().count()
+        json_content = JsonResponse(content)
     return json_content
-    # return JsonResponse(content)
+   

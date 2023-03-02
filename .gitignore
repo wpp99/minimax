@@ -1,0 +1,6 @@
+*.xlsx
+/static/
+*.pyc
+*/migrations/*
+*/static/plugins/
+/minimax/settings.py

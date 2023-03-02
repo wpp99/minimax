@@ -83,10 +83,10 @@ layui.use(function () {
                           });
                       },
                       complete: function(){
-                          
+                          layer.close(loadIndex);
                       },
                       success: function(result, state, xhr){
-                          layer.close(loadIndex);
+                          layer.msg("导出成功");
                           window.location.href = '/b/output?pro_no='+ data.pro_no;
                           // // console.log(xhr);
                           // let fileName = xhr.getResponseHeader('Content-Disposition').split(';')[1].split('=')[1].replace(/\"/g, '')

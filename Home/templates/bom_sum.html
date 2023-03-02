@@ -40,6 +40,14 @@
                 display: flex;
                 flex-direction: column;
             }
+            .page {
+                display: flex;
+                flex-direction: row;
+            }
+            .page .count{
+                margin-left: 20px;
+                margin-top: 15px;
+            }
         </style>
         <title>Document</title>
     </head>
@@ -47,6 +55,15 @@
         <div class="layui-card">
             <div class="layui-card-header">
                 <button class="layui-btn" id="bom_sum">bom汇总</button>
+                <div class="layui-inline layui-form">
+                    <select class="bom_select" name="bom" lay-verify="" lay-search>
+                        <option value="0">all</option>
+                        {% for key, val in bom_name.items %}
+                            <option value="{{val}}">{{key}}</option>
+                        {% endfor %}
+                    </select>  
+                </div>
+                <button class="layui-btn" id="bom_select">筛选</button>
             </div>
             <div class="layui-card-body main_body" data-count="{{count}}">
                 <table class="layui-table" id="demo" lay-filter="demo">
@@ -93,8 +110,6 @@
                                     </a>
                                 </li>
                                 {%endfor%}
-                                
-                                
                             </td>
                             <td>{{d.submit_date}}</td>
                         </tr> 
@@ -103,7 +118,13 @@
                 </table>
             </div>
         </div>
-        <div id="page"></div>
+        
+        <div class="page">
+            <div id="page"></div>
+            <a class="count">共 {{count}} 条</a>
+        </div>
+        
+        
         <script type="text/html" id="barDemo">
             <a class="layui-btn layui-btn layui-btn-xs" id="projection_b"  lay-event="btable" href="javascript:;">b表</a>
             <a class="layui-btn layui-btn-normal layui-btn-xs" id="projection_edit" lay-event="edit">编辑</a>
@@ -115,7 +136,8 @@
             var $ = layui.$;
             var loadIndex;
             var count = $(".main_body").attr("data-count");
-            
+            var bom_name;
+
             $("#bom_sum").click(function(){
                 $.ajax({
                     method: "GET",
@@ -131,19 +153,21 @@
                     success: function(res){
                         layer.msg(res.msg);
                         if (res.code == 0){
-                            document.location = "/bominterface/bom_all?page=1&limit=10"
+                            document.location = "/bominterface/bom_all?page=1&limit=10&bom=all"
                         }
                     }
                 })
             });
             
+            // 分页
             layui.use('laypage', function(){
                 var laypage = layui.laypage;
-                
+                count = $(".main_body").attr("data-count");
                 //执行一个laypage实例
                 laypage.render({
                     elem: 'page' // ID，不用加 # 号
                     ,count: count 
+                    ,groups: 3
                     ,limit: 10
                     ,limits: [10, 20, 30, 50]
                     ,layout: ['prev', 'skip', 'page', 'next', 'limit']
@@ -151,12 +175,14 @@
                         //首次不执行
                         if(!first){
                         //do something
+                            bom_name=  $(".bom_select option:selected").text();
                             $.ajax({
                                 type: "GET",
                                 url: "/bominterface/bom_all",
                                 data: {
                                     page: obj.curr,
                                     limit: obj.limit,
+                                    bom: bom_name,
                                 },
                                 beforeSend: function(){
                                     loadIndex = layer.load(1, {
@@ -178,6 +204,38 @@
                     
                 });
             }); 
+            
+            // 按系统选择数据
+            
+            $("#bom_select").click(function(){
+                bom_name=  $(".bom_select option:selected").text();
+                count = $(".main_body").attr("data-count");
+                $.ajax({
+                    type: "GET",
+                    url: "/bominterface/bom_all",
+                    data: {
+                        'bom': bom_name,
+                        'page': 1,
+                        'limit': 10,
+                    },
+                    beforeSend: function(){
+                        loadIndex = layer.load(1, {
+                            shade: [0.1, "#fff"]
+                        });
+                    },
+                    complete: function(){
+                        layer.close(loadIndex);
+                    },
+                    success: function(res){
+                        var reg = /<table.*?>[\s\S]*?<\/table>/mg;
+                        table_res = reg.exec(res)[0];
+                        $(".main_body").html(table_res);
+                        // $(document.getElementsByTagName("iframe")).html(res);
+                    }
+                });
+            });
+
+            
         </script>
 
     </body>

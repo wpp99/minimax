@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
-from Home.models import Product
+from Home.models import Product, Inventory
 from B.views.common import bom_map_inverse, bom_map
 
 
@@ -25,7 +25,7 @@ def get_product_data(req):
     start = (page - 1) * limit
     end = page * limit 
     numbers = [*range(start, end)]
-
+    data = []
     con2 = Q(product_name__contains=condiction_name) | Q(product_code=condiction_name) | Q(inventory_code__startswith=condiction_name)
     if pro_system != 'all':
         con1 = Q(pro_system=bom_map[pro_system])
@@ -37,20 +37,22 @@ def get_product_data(req):
         data_obj = Product.objects.all()
         if condiction_name:
             data_obj = Product.objects.filter(con2)
-    data = [{
-        'no': i + 1,
-        'id': x.id,
-        'product_code': x.product_code, 
-        'inventory_cod': x.inventory_code, 
-        'product_name': x.product_name,
-        'unit': x.unit,
-        'product_type': x.product_type, 
-        'pro_system': x.get_pro_system_display(), 
-        'supply': x.supply, 
-        'place_no': x.place_no, 
-        'num': x.inventory_num, 
-        'detail': x.detail, 
-    } for i, x in  zip(numbers, data_obj[start:end])]
+    for i, x in  zip(numbers, data_obj[start:end]):
+        invetory_obj = Inventory.objects.filter(product_code=x.product_code).first()
+        data.append({
+            'no': i + 1,
+            'id': x.id,
+            'product_code': x.product_code, 
+            'inventory_cod': x.inventory_code, 
+            'product_name': x.product_name,
+            'unit': x.unit,
+            'product_type': x.product_type, 
+            'pro_system': x.get_pro_system_display(), 
+            'supply': x.supply, 
+            'place_no': x.place_no, 
+            'num': invetory_obj.inven_now_num if invetory_obj else 0, 
+            'detail': x.detail, 
+        })
     content = {
         'code': 0,
         'msg': '',
@@ -121,7 +123,7 @@ def product_edit(req, pro_system, id):
 
 def product_delete(req, pro_system, id):
     Product.objects.filter(id=id).delete()
-    return redirect('/product/'+ pro_system)
+    return redirect('/product/prosystem/'+ pro_system)
 
 
 

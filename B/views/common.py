@@ -1,5 +1,5 @@
 import pandas as pd
-import os, re
+import os, re, json
 from datetime import datetime
 
 from B.models import Projection, B1nz, Boms, BsjXQDD
@@ -43,7 +43,6 @@ choice_map = {
 }
 
 
-
 bom_map = {
     'SGY01': 1,
     'SGY02': 2,
@@ -76,11 +75,6 @@ choice_map = dict(choice_map, **bom_map)
 bom_name = bom_map.keys()
 
 
-"""
-
-
-"""
-
 def make_header(model_obj):
     header = []
     for field in  model_obj._meta.fields:
@@ -90,7 +84,6 @@ def make_header(model_obj):
 
 
 class Del_Load_1nz:
-
     def __init__(self, file_obj):
         self.file_obj = file_obj
         self.res_datalist = []
@@ -108,7 +101,6 @@ class Del_Load_1nz:
             return "取消"
         return "未开始"
     
-
     def del_date(self, date_data):
         """处理时间"""
         res = re.findall("(\d{4}-\d{2}-\d{2})", str(date_data))
@@ -131,10 +123,10 @@ class Del_Load_1nz:
             return float(res[0])
         return 0
 
-    def del_1nz(self):
+    def del_1nz(self, file_name=None):
         header = 7
-        if not isinstance(self.file_obj, TemporaryUploadedFile):
-            t_pro = os.path.split(self.file_obj)[1].replace("ML_all", '').replace(".xlsx", '')
+        if file_name:
+            t_pro = file_name.replace("ML_all", '').replace(".xlsx", '')
             if t_pro == "9889212001" or t_pro == "8409212002":
                 header = 8
         
@@ -214,31 +206,19 @@ class Del_load_sjxqd:
                 strings += ";"
         return strings
     
-    def del_sjxqd(self):
+    def del_sjxqd(self, file_name=None):
         """处理数据"""
         header = 6
-        t_pro = os.path.split(self.file_obj)[1].replace("ML_all", '').replace(".xlsx", '')
+        if file_name:
+            t_pro = file_name.replace("ML_all", '').replace(".xlsx", '')
+        else:
+            t_pro = os.path.split(self.file_obj)[1].replace("ML_all", '').replace(".xlsx", '')
         if t_pro == "9887142040":
-            header = 7
+            header = 7225
         excel_data = pd.read_excel(self.file_obj, sheet_name='sjXQD', header=header)
         obj_data = excel_data[excel_data.iloc[:, 4].notna()]
         obj_data = obj_data.fillna('')
-        # 填充序号为空的列
-        # j = 1
-        # new_index = []
-        # for i, number in enumerate(obj_data.index):
-        #     if str(obj_data.index[i-1]) != 'nan':
-        #         pre = obj_data.index[i-1]
-        #         j = 1
-        #     if str(number) == 'nan':
-        #         new_num = str(pre) + f'.{j}'
-        #         new_index.append(new_num)
-        #         j += 1
-        #     else:
-        #         new_index.append(str(number))
 
-        # obj_data.set_axis(new_index, axis=0, inplace=True)
-        obj_data = obj_data.fillna('')
         for index, row in obj_data.iterrows():
             
             if t_pro in self.extra_pro:
@@ -260,7 +240,6 @@ class Del_load_sjxqd:
                 zgxy = row[3]
                 status = row[9]
             
-                
             self.res_datalist.append({
                 'num': str(row[1])[:25],
                 "sys_code": str(row[2])[:25],
@@ -278,6 +257,7 @@ class Del_load_sjxqd:
                 "xqd2":row["XQD2"],
                 "xqd_remind":xqd_remind,
             })
+        return self.res_datalist
    
     def load_sjxqd(self, pro_no):
         BsjXQDD.objects.filter(pro_no=pro_no).delete()
@@ -293,7 +273,7 @@ class Del_load_sjxqd:
 
 class Del_load_bom:
     
-    def __init__(self, file_obj):
+    def __init__(self, file_obj=None):
         self.file_obj = file_obj
         self.res_datalist = []
     
@@ -307,7 +287,7 @@ class Del_load_bom:
                     continue
                 data_dict[n] = int(res[0])
 
-        return data_dict
+        return json.dumps(data_dict)
 
     def del_num_null(self, d):
         if isinstance(d, datetime):
@@ -317,7 +297,7 @@ class Del_load_bom:
             return float(res[0])
         return 0
 
-    def del_bom(self, pro_no, sheet_name):
+    def del_bom(self, sheet_name):
         """处理数据"""
         # data_head5 = pd.read_excel(self.file_obj, sheet_name=sheet_name, header=5)
         df = pd.read_excel(self.file_obj, sheet_name=sheet_name, header=5)
@@ -327,13 +307,9 @@ class Del_load_bom:
         bd_names = columns["C601": "C699"]
         be_names = columns["C701": "C790"]
         
-        # excel_data = pd.read_excel(self.file_obj, sheet_name=sheet_name, header=[5, 7])
-        # obj_data = excel_data[excel_data["C103"]["Qty.\n数量"].map(str).str.contains("[1-9]+")]
-        body = df.iloc[1:, :]
         data = df[df["C103"].map(str).str.contains("[1-9]\d*")]
         data = data.fillna('')
         
-
         for index, row in data.iterrows():
             self.res_datalist.append({
                 "inventory_code": row["C102"],
@@ -360,10 +336,11 @@ class Del_load_bom:
                 # "be_res": self.del_num_null(row["C796"]["剩余总量"]),
                 # "be_bb": row["C798"]["安装与设计对比"],
             })
+        return self.res_datalist
         
     
     def make_product_code(self, inventory_code, unit, product_name, product_type, supply, m_system):
-        if not str(inventory_code).startswith("0"):
+        if not str(inventory_code).startswith("000000000"):
             pro_obj = Product.objects.filter(inventory_code=inventory_code).first()
             if pro_obj:
                 return pro_obj.product_code

@@ -20,7 +20,7 @@
             </div> {% endcomment %}
 
             <div class="layui-inline layui-form">
-                <select name="city" lay-verify="" lay-search>
+                <select class="upload_name" name="upload" lay-verify="" lay-search>
                     <option value="010">选择sheet</option>
                     {% for key, val in sheet_name.items %}
                         <option value="{{val}}">{{key}}</option>
@@ -48,7 +48,8 @@
 
     <script src="{%static 'plugins/layui/layui.js'%}"></script>
     <script src="{%static 'plugins/jquery-3.6.3.min.js'%}"></script>
-    <script src="{%static 'js/uploads.js'%}"></script>
+    <!-- <script src="{%static 'js/common.js'%}"></script> -->
+    <script src="{%static 'js/uploads.js'%}" type="module"></script>
     <script>
         
     </script>

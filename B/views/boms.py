@@ -10,7 +10,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from B.models import  Boms
 from B.views.common import choice_map
 from Home.models import Product
-from Home.views.output import get_keys
+# from Home.views.output import get_keys
 
 
 def del_data_(data, heads):
