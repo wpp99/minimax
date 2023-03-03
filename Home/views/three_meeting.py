@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 
-from Home.models import Product, ThreePartMeet, threePartRemark, get_next_week2_date
+from Home.models import Product, ThreePartMeet, threePartRemark, get_next_week2_date, Inventory
 from B.models import Projection, B1nz, Boms
 from B.views.boms import del_data
 from B.views.common import choice_map
@@ -226,7 +226,8 @@ def get_meeting_product_data(req, his_this):
                 product_name = product_object.product_name
                 product_type = product_object.product_type
                 supply = product_object.supply
-                num = product_object.inventory_num
+                inventory_obj = Inventory.objects.filter(product_code=product_code).first()
+                num = inventory_obj.inven_now_num if inventory_obj else 0
                 three_product_code = threemeet_code + "_" + str(i).rjust(7, '0')
                 data.append({
                     'no': i,

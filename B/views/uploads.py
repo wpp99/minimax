@@ -40,6 +40,7 @@ def upload_del(req, sheet_name=None):
     msg = "上传成功"
     file_obj = req.FILES.get('file')
     file_name = str(file_obj)
+    print(file_name)
     upload_obj = Del_load_upload(file_obj)
     try:
         if sheet_name == '1nz':
@@ -52,17 +53,17 @@ def upload_del(req, sheet_name=None):
             b1nz_obj = Del_load_bom(file_obj)
             data = b1nz_obj.del_bom(sheet_name)
         elif sheet_name == "product":
-            upload_obj.del_product()
+            data = upload_obj.del_product()
         elif sheet_name == "projection":
-            upload_obj.del_projection()
+            data = upload_obj.del_projection()
         elif sheet_name == "guan":
-            upload_obj.del_guan()
+            data = upload_obj.del_guan()
         elif sheet_name == "warehouse":
-            upload_obj.del_warehouse()
+            data = upload_obj.del_warehouse()
         elif sheet_name == "purchase":
-            upload_obj.del_purchase()
+            data = upload_obj.del_purchase()
         elif sheet_name == "sale_out":
-            upload_obj.del_sale_out()
+            data = upload_obj.del_sale_out()
         else:
             status = 1
             msg = f"上传失败：无{sheet_name}"
@@ -277,8 +278,6 @@ class Del_load_upload:
             data.append(data_data)
 
     def del_warehouse(self):
-        global data
-        data.clear()
         excel_file = pd.read_excel(self.data_obj, header=1)
         excel_file = excel_file[excel_file["存货编码"].notna()]
         excel_file["预计入库数量合计"].fillna(0, inplace=True)
@@ -288,7 +287,7 @@ class Del_load_upload:
         excel_file.fillna("", inplace=True)
         for index, row in excel_file.iterrows():
             product_code = Del_load_bom().make_product_code(row["存货编码"], row["主计量单位"], row["存货名称"], row["规格型号"], None, None)
-            data.append({
+            self.data.append({
                 "product_code": product_code,
                 "warehouse_code": row["仓库编码"],
                 "warehouse_name": row["仓库名称"],
@@ -302,19 +301,22 @@ class Del_load_upload:
                 "inven_con_code": row["存货合同号"],
                 "need_flow_code": row["需求跟踪号"],
             })
+        return self.data
 
     def del_purchase(self):
-        global data
-        data.clear()
         excel_file = pd.read_excel(self.data_obj)
         excel_file = excel_file[excel_file["业务类型"].notna()]
         excel_file["数量"].fillna(0, inplace=True)
         excel_file["累计入库数量"].fillna(0, inplace=True)
-        excel_file["cum_towarehouse_num"].fillna(0, inplace=True)
+        # excel_file["cum_towarehouse_num"].fillna(0, inplace=True)
         excel_file.fillna("", inplace=True)
         for index, row in excel_file.iterrows():
-            product_code = Del_load_bom().make_product_code(row["存货编号"], row["主计量"], row["存货名称"], row["规格型号"], None, None)
-            data.append({
+            if not row["存货编号"].startswith("000000000"):
+                product_code = Del_load_bom().make_product_code(row["存货编号"], row["主计量"], row["存货名称"], row["规格型号"], None, None)
+            else:
+                product_code = ""
+            self.data.append({
+                "ac_set": row["账套"],
                 "product_code": product_code,
                 "business_type": row["业务类型"],
                 "purchase_type": row["采购类型"],
@@ -324,9 +326,9 @@ class Del_load_upload:
                 "upper_order_code": row["上游单据号"],
                 "prepared_by": row["制单人"],
                 "reviewed_by": row["审核人"],
-                "order_date": row["日期"],
-                "audit_date": row["审核时间"],
-                "arrive_date": row["计划到货日期"],
+                "order_date": self.del_date(row["日期"]),
+                "audit_date": self.del_date(row["审核时间"]),
+                "arrive_date": self.del_date(row["计划到货日期"]),
                 "remark": row["行备注"],
                 "pro_batch": row["项目DY批次号"],
                 "depart": row["部门"],
@@ -336,16 +338,18 @@ class Del_load_upload:
                 "drictship": row["直运至"],
                 "cum_towarehouse_num": row["累计入库数量"],
             })
+        return self.data
 
     def del_sale_out(self):
-        global data
-        data.clear()
         excel_file = pd.read_excel(self.data_obj)
         excel_file = excel_file[excel_file["仓库编码"].notna()]
         excel_file.fillna('', inplace=True)
         for index, row in excel_file.iterrows():
-            product_code = Del_load_bom().make_product_code(row["存货编码"], row["主计量单位"], row["存货名称"], row["规格型号"], None, None)
-            data.append({
+            if not row["存货编码"].startswith("000000000"):
+                product_code = Del_load_bom().make_product_code(row["存货编码"], row["主计量单位"], row["存货名称"], row["规格型号"], None, None)
+            else:
+                product_code = ""
+            self.data.append({
                 "product_code": product_code,
                 "warehouse_code": row["仓库编码"],
                 "warehouse_name": row["仓库"],
@@ -357,10 +361,11 @@ class Del_load_upload:
                 "order_code": row["来源订单号"],
                 "prepared_by": row["制单人"],
                 "reviewed_by": row["审核人"],
-                "out_date": row["出库日期"],
-                "audit_date": row["审核时间"],
+                "out_date": self.del_date(row["出库日期"]),
+                "audit_date": self.del_date(row["审核时间"]),
                 "out_type": row["出库类别"],
             })
+        return self.data 
 
     def find_pro_path(self, pro_no, year, depart_place):
         """获取B表存储位置"""
@@ -594,23 +599,24 @@ class Del_load_upload:
     def load_warehouse(self, dd):
         Inventory.objects.all().delete()
         obj_list = []
-        print(len(dd))
         for data_item in dd:
-            print("i")
+
             i_obj = Inventory(**data_item)
             obj_list.append(i_obj)
         Inventory.objects.bulk_create(obj_list)
 
     def load_purchase(self, data):
+        PurchaseOrder.objects.all().delete()
         obj_list = []
         for data_item in data:
             i_obj = PurchaseOrder(**data_item)
-        obj_list.append(i_obj)
+            obj_list.append(i_obj)
         PurchaseOrder.objects.bulk_create(obj_list)
 
     def load_sale_out(self, data):
+        SaleOutInventory.objects.all().delete()
         obj_list = []
         for data_item in data:
             i_obj = SaleOutInventory(**data_item)
-        obj_list.append(i_obj)
+            obj_list.append(i_obj)
         SaleOutInventory.objects.bulk_create(obj_list)

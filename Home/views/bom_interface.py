@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
 
 from Home.models import Product, Bom_sum_record, Inventory, SaleOutInventory, PurchaseOrder
 from B.models import Projection, B1nz, Boms
@@ -49,6 +50,13 @@ def bom_sum(req):
     bom_sum_obj = bom_sum_obj.order_by("-total_sum")
     return render(req, "bom_sum.html", {"datas": bom_sum_obj[start: end], "count": bom_sum_obj.count(), "bom_name": bom_map})
 
+
+@csrf_exempt
+def search(req):
+    url = "/yy/"
+    field_dict = {field.name: field.verbose_name for field in SaleOutInventory._meta.get_fields()}
+    print(field_dict)
+    return render(req, "search.html", {'url': url, "field": field_dict})
 
 def bc_sum(d):
     """处理bc的数字"""
@@ -114,13 +122,14 @@ def get_interface_data(req, interface):
     start = (page - 1) * limit
     end = page * limit 
     numbers = [*range(start, end)]
-
+    data = []
     content = {
         "code": 0,
         "msg": "success",
         "data": [],
         "count": 0
     }
+    condiction = req.GET.get("con")
     json_content = JsonResponse(content)
     if interface == "ALL1nz":
         json_content = get_1nz_data(req, "all_1nz")
@@ -145,50 +154,74 @@ def get_interface_data(req, interface):
         
         content["data"] = data
         content["count"] = Inventory.objects.all().count()
-        print(content)
+       
         json_content = JsonResponse(content)
     elif interface == "sale_out":
-        data = [{
-            "no": i+1,
-            "three_product_code":x.three_product_code,
-            "product_code":x.product_code,
-            "inventory_code":x.inventory_code,
-            "ac_set":x.ac_set,
-            "warehouse_code":x.warehouse_code,
-            "warehouse_name":x.warehouse_name,
-            "warehouse_out_code":x.warehouse_out_code,
-            "out_num":x.out_num,
-            "out_date":x.out_date,
-            "order_code":x.order_code,
-            "reviewed_by":x.reviewed_by,
-            "audit_date":x.audit_date,
-            "out_type":x.out_type,
-        } for i, x in zip(numbers, SaleOutInventory.objects.all()[start:end])]
+        data_obj = SaleOutInventory.objects.all()
+        if req.GET.get("Q5") == "true":
+            data_obj = SaleOutInventory.objects.exclude(Q(reviewed_by="") | Q(out_type="委托加工成品采购") | Q(depart__startswith="D9"))
+            print(data_obj.count())
+        if condiction:
+            data_obj = SaleOutInventory.objects.filter(Q(product_code=condiction) | Q(inventory_code=condiction) | Q(pro_batch__contains=condiction))
+        
+            
+        for i, x in zip(numbers, data_obj[start:end]):
+            data.append({
+                "no": i+1,
+                "three_product_code":x.three_product_code,
+                "pro_batch":x.pro_batch,
+                "depart":x.depart,
+                "product_code":x.product_code,
+                "inventory_code":x.inventory_code,
+                "ac_set":x.ac_set,
+                "warehouse_code":x.warehouse_code,
+                "warehouse_name":x.warehouse_name,
+                "warehouse_out_code":x.warehouse_out_code,
+                "out_num":x.out_num,
+                "out_date":x.out_date,
+                "order_code":x.order_code,
+                "reviewed_by":x.reviewed_by,
+                "audit_date":x.audit_date,
+                "out_type":x.out_type,
+            })
         content["data"] = data
-        content["count"] = SaleOutInventory.objects.all().count()
+        content["count"] = data_obj.count()
         json_content = JsonResponse(content)
     elif interface == "purchase":
-        print("b")
-        data = [{
-            "no": i+1,
-            "three_product_code":x.three_product_code,
-            "product_code":x.product_code,
-            "inventory_code":x.inventory_code,
-            "order_code":x.order_code,
-            "business_type":x.business_type,
-            "purchase_type":x.purchase_type,
-            "purchase_num":x.purchase_num,
-            "upper_order_code":x.upper_order_code,
-            "prepared_by":x.prepared_by,
-            "order_date":x.order_date,
-            "reviewed_by":x.reviewed_by,
-            "audit_date":x.audit_date,
-            "arrive_date":x.arrive_date,
-            "warehouse_status":x.warehouse_status,
-            "remark":x.remark,
-        } for i, x in zip(numbers, PurchaseOrder.objects.all()[start:end])]
+        data_obj = PurchaseOrder.objects.all()
+        if req.GET.get("Q4") == "true":
+            data_obj = PurchaseOrder.objects.exclude(Q(reviewed_by="")  | Q(depart__startswith="D9")).exclude(
+                (Q(ac_set=1) | Q(ac_set=2)) & Q(business_type="普通采购") & ~Q(purchase_type="委托加工成品采购") 
+            )
+        if condiction:
+            data_obj = PurchaseOrder.objects.filter(
+                Q(pro_batch__contains=condiction) | Q(order_code=condiction)
+            )
+        for i, x in zip(numbers, data_obj[start:end]):
+            data.append({
+                "no": i+1,
+                "three_product_code":x.three_product_code,
+                "ac_set":x.ac_set,
+                "pro_batch":x.pro_batch,
+                "pro_des":x.pro_des,
+                "depart":x.depart,
+                "product_code":x.product_code,
+                "inventory_code":x.inventory_code,
+                "order_code":x.order_code,
+                "business_type":x.business_type,
+                "purchase_type":x.purchase_type,
+                "purchase_num":x.purchase_num,
+                "upper_order_code":x.upper_order_code,
+                "prepared_by":x.prepared_by,
+                "order_date":x.order_date,
+                "reviewed_by":x.reviewed_by,
+                "audit_date":x.audit_date,
+                "arrive_date":x.arrive_date,
+                "warehouse_status":x.warehouse_status,
+                "remark":x.remark,
+            })
         content["data"] = data
-        content["count"] = PurchaseOrder.objects.all().count()
+        content["count"] = data_obj.count()
         json_content = JsonResponse(content)
     return json_content
    

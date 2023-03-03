@@ -15,6 +15,21 @@
                 {% if interface == "bom_all" %}
                     <button class="layui-btn" id="bom_sum">bom汇总</button>
                 {% endif %}
+                {% if interface == "purchase" or interface == "sale_out" or interface == "warehouse"%}
+                <div class="search layui-inline">
+                    <div class="layui-input-inline" style="width: 200px;">
+                        <input id="yy_search" type="text" name="title" placeholder="产品编码|项目号|存货编码" class="layui-input">
+                    </div>
+                    <a class="layui-btn" id="yy_search_btn">筛选</a>
+                </div>
+                {% endif %}
+                {% if interface == "purchase" %}
+                    <button class="layui-btn" id="Q9_0">Q9原始</button>
+                    <button class="layui-btn" id="Q4">Q4</button>
+                    {% endif %}
+                {% if interface == "sale_out" %}    
+                    <button class="layui-btn" id="Q5">Q5</button>
+                {% endif %}
             </div>
             <div class="layui-card-body">
                 <table class="layui-hide" id="demo" lay-filter="test"></table>
@@ -28,4 +43,5 @@
         <script src="{% static 'js/interface.js' %}" type="module"></script>
 
     </body>
+    
 </html>

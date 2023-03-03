@@ -25,14 +25,15 @@ layui.use(function(){
         ,auto: false     // 选完之后制动上传
         ,bindAction: '.preview'
         ,multiple:false    //
-        // ,number:0    // 同时可上传的文件数量 0： 没有限制
+        ,number:1    // 同时可上传的文件数量 0： 没有限制
         ,drag: true
         ,choose: function(obj){
              //将每次选择的文件追加到文件队列
-            var files = obj.pushFile();
+            // var files = obj.pushFile();
             
             //预读本地文件，如果是多文件，则会遍历。(不支持ie8/9)
-            obj.preview(function(index, file, result){
+            // obj.preview(function(index, file, result){
+            //     console.log(index, file);
                 // console.log(index); //得到文件索引
                 // console.log(file); //得到文件对象
                 // console.log(result); //得到文件base64编码，比如图片
@@ -43,7 +44,7 @@ layui.use(function(){
             
             //obj.upload(index, file); //对上传失败的单个文件重新上传，一般在某个事件中使用
             //delete files[index]; //删除列表中对应的文件，一般在某个事件中使用
-            });
+            // });
         }
 
         ,before: function(obj){

@@ -340,13 +340,13 @@ class Del_load_bom:
         
     
     def make_product_code(self, inventory_code, unit, product_name, product_type, supply, m_system):
-        if not str(inventory_code).startswith("000000000"):
+        if not str(inventory_code).startswith("00000000"):
             pro_obj = Product.objects.filter(inventory_code=inventory_code).first()
             if pro_obj:
                 return pro_obj.product_code
         
         last_id = Product.objects.all().order_by("-id").first().id
-        new_pro_code = "p" + str(last_id+1).rjust(12, '0')
+        new_pro_code = "p" + str(last_id+3).rjust(12, '0')
         Product.objects.create(product_code=new_pro_code, inventory_code=inventory_code, 
             product_name=product_name, product_type=product_type, unit=unit, supply=supply, pro_system=m_system)
         return new_pro_code

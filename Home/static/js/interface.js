@@ -12,7 +12,7 @@ layui.use(function () {
     var head = get_head(path_part);
     var data_url = "/bominterface/getData/"+path_part;
 
-    render_table(data_url, head)
+    render_table(data_url, head);
     // 渲染表格
     function render_table(url, head){
         table.render({
@@ -32,5 +32,29 @@ layui.use(function () {
             ],
         });
     };
+
+    $("#Q5").click(function(){
+        data_url = "/bominterface/getData/"+path_part + "?Q5=true";
+        render_table(data_url, head);
+    });
+
+    $("#Q4").click(function(){
+        data_url = "/bominterface/getData/"+path_part + "?Q4=true";
+        render_table(data_url, head);
+    });
+
+    $("#yy_search_btn").click(function(){
+        // var condiction = $("#yy_search").val();
+        // data_url = "/bominterface/getData/"+path_part + "?con="+condiction;
+        // render_table(data_url, head);
+        $.post('/yy/search', {}, function(str){
+            layer.open({
+              type: 1,
+              content: str,
+              title: "高级检索",
+              
+            });
+        });
+    })
 });
   
