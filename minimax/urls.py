@@ -68,8 +68,10 @@ urlpatterns = [
     path('yy/warehouse', bom_interface.bom_interface),
     path('yy/purchase', bom_interface.bom_interface),
     path('yy/sale_out', bom_interface.bom_interface),
+    path('yy/search', bom_interface.search),
     path('bominterface/getData/<str:interface>', bom_interface.get_interface_data),
     
+    path('guan', guan.guan),
     path('guan/data', guan.get_guan_data),
     path('guan/add', guan.guan_add),
     path('guan/edit/<str:id>', guan.guan_edit),

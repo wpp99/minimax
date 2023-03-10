@@ -185,7 +185,7 @@ class SaleOrder(models.Model):
 class PurchaseOrder(models.Model):
     three_product_code = models.CharField(verbose_name="流程号", max_length=40, null=True, blank=True)
     ac_set = models.CharField(verbose_name="账套", max_length=20, null=True, blank=True)
-    pro_batch = models.CharField(verbose_name="项目批次号", max_length=100, null=True, blank=True)
+    pro_batch = models.CharField(verbose_name="项目批次号", max_length=255, null=True, blank=True)
     pro_des = models.CharField(verbose_name="项目描述", max_length=255, null=True, blank=True)
     depart = models.CharField(verbose_name="部门", max_length=10, null=True, blank=True)
     product_code = models.CharField(verbose_name="产品编码", max_length=30, null=True, blank=True)
@@ -228,7 +228,7 @@ class Inventory(models.Model):
 # 销售出库订单 
 class SaleOutInventory(models.Model):
     three_product_code = models.CharField(verbose_name="流程号", max_length=40, null=True, blank=True)
-    pro_batch = models.CharField(verbose_name="项目批次号", max_length=100, null=True, blank=True)
+    pro_batch = models.CharField(verbose_name="项目批次号", max_length=255, null=True, blank=True)
     depart = models.CharField(verbose_name="销售部门", max_length=10, null=True, blank=True)
     product_code = models.CharField(verbose_name="产品编码", max_length=20)
     inventory_code = models.CharField(verbose_name="存货编码", max_length=20)
@@ -243,6 +243,7 @@ class SaleOutInventory(models.Model):
     reviewed_by = models.CharField(verbose_name="审核人", max_length=10, null=True, blank=True)
     audit_date = models.DateField(verbose_name="审核时间", null=True, blank=True)
     out_type = models.CharField(verbose_name="出库类型", max_length=20, null=True, blank=True)
+    srd_pro_code = models.CharField(verbose_name="srd产品编号", max_length=40, null=True, blank=True)
 
 
 

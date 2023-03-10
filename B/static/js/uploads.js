@@ -19,7 +19,7 @@ layui.use(function(){
         elem: '#test1' //绑定元素
         ,url: '/upload/del/' +  $("select option:selected").text() //上传接口
         ,accept: 'file'  // 文件类型
-        ,size: 5000         // 文件大小
+        ,size: 10000         // 文件大小
         ,data: {id: 1}
         ,exts: 'xlsx|xls'  // 结合accpet 使用
         ,auto: false     // 选完之后制动上传

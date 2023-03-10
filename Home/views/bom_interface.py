@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 
-from Home.models import Product, Bom_sum_record, Inventory, SaleOutInventory, PurchaseOrder
+from Home.models import Product, Bom_sum_record, Inventory, SaleOutInventory, PurchaseOrder, Guan
 from B.models import Projection, B1nz, Boms
 from B.views.boms import del_data
 from B.views.b1nz import get_1nz_data
@@ -55,7 +55,6 @@ def bom_sum(req):
 def search(req):
     url = "/yy/"
     field_dict = {field.name: field.verbose_name for field in SaleOutInventory._meta.get_fields()}
-    print(field_dict)
     return render(req, "search.html", {'url': url, "field": field_dict})
 
 def bc_sum(d):
@@ -129,42 +128,52 @@ def get_interface_data(req, interface):
         "data": [],
         "count": 0
     }
+    
+    sgy02_list = [p_obj.inventory_code for p_obj in Product.objects.filter(pro_system=2)]
     condiction = req.GET.get("con")
+    
     json_content = JsonResponse(content)
     if interface == "ALL1nz":
         json_content = get_1nz_data(req, "all_1nz")
     elif interface == "sjXqdall":
         json_content = get_sjxqd_data(req, "all_sjxqd")
     elif interface == "warehouse":
-        data = [{
-            "no": i+1,
-            "product_code":x.product_code,
-            "inventory_code":x.inventory_code,
-            "inventory_name":x.inventory_name,
-            "warehouse_code":x.warehouse_code,
-            "warehouse_name":x.warehouse_name,
-            "inven_now_num":x.inven_now_num,
-            "to_inventory_num":x.to_inventory_num,
-            "inven_delivery_num":x.inven_delivery_num,
-            "inven_class_code":x.inven_class_code,
-            "inven_class_name":x.inven_class_name,
-            "inven_con_code":x.inven_con_code,
-            "need_flow_code":x.need_flow_code,
-        } for i, x in zip(numbers, Inventory.objects.all()[start:end])]
+        data_obj = Inventory.objects.all()
+        if req.GET.get("Q7") == "true":
+            cangku = ["1号库-通用件库KC", "2号库-生产产成品库", "2号库-生产原材料库", "3号库-出口商品库", "4号库-免费库", "4号库-委托保管库", 
+                      "5号库-进料加工保税产成品库", "6号库-委托加工产成品库", "销售出库单列表SGY02"]
+            data_obj = Inventory.objects.filter(Q(warehouse_name__in=cangku)).exclude(Q(warehouse_name="2号库-生产原材料库"), ~Q(inventory_code__in=sgy02_list))   
+        if condiction:
+            data_obj = data_obj.filter(Q(product_code=condiction) | Q(inventory_code=condiction))
+        for i, x in zip(numbers, data_obj[start:end]):
+            product_obj = Product.objects.filter(inventory_code=x.inventory_code).first()
+            data.append({
+                "no": i+1,
+                "product_code":x.product_code,
+                "inventory_code":x.inventory_code,
+                "inventory_name":product_obj.product_name,
+                "warehouse_code":x.warehouse_code,
+                "warehouse_name":x.warehouse_name,
+                "inven_now_num":x.inven_now_num,
+                "to_inventory_num":x.to_inventory_num,
+                "inven_delivery_num":x.inven_delivery_num,
+                "inven_class_code":x.inven_class_code,
+                "inven_class_name":x.inven_class_name,
+                "inven_con_code":x.inven_con_code,
+                "need_flow_code":x.need_flow_code,
+            })
+
         
         content["data"] = data
-        content["count"] = Inventory.objects.all().count()
+        content["count"] = data_obj.count()
        
         json_content = JsonResponse(content)
     elif interface == "sale_out":
         data_obj = SaleOutInventory.objects.all()
         if req.GET.get("Q5") == "true":
-            data_obj = SaleOutInventory.objects.exclude(Q(reviewed_by="") | Q(out_type="委托加工成品采购") | Q(depart__startswith="D9"))
-            print(data_obj.count())
+            data_obj = SaleOutInventory.objects.exclude(Q(ac_set="SGY02") | Q(reviewed_by="") | Q(out_type="委托加工成品采购") | Q(depart__startswith="D9")) 
         if condiction:
-            data_obj = SaleOutInventory.objects.filter(Q(product_code=condiction) | Q(inventory_code=condiction) | Q(pro_batch__contains=condiction))
-        
-            
+            data_obj = data_obj.filter(Q(product_code=condiction) | Q(inventory_code=condiction) | Q(pro_batch__contains=condiction))
         for i, x in zip(numbers, data_obj[start:end]):
             data.append({
                 "no": i+1,
@@ -183,20 +192,26 @@ def get_interface_data(req, interface):
                 "reviewed_by":x.reviewed_by,
                 "audit_date":x.audit_date,
                 "out_type":x.out_type,
+                "srd_pro_code":x.srd_pro_code,
             })
         content["data"] = data
         content["count"] = data_obj.count()
         json_content = JsonResponse(content)
     elif interface == "purchase":
         data_obj = PurchaseOrder.objects.all()
+        con1 = Q(pro_batch__contains=condiction) | Q(order_code=condiction) | Q(product_code=condiction) | Q(inventory_code=condiction)
         if req.GET.get("Q4") == "true":
-            data_obj = PurchaseOrder.objects.exclude(Q(reviewed_by="")  | Q(depart__startswith="D9")).exclude(
+            data_obj = PurchaseOrder.objects.exclude(Q(ac_set="SGY02") | Q(ac_set="Q9")).exclude(Q(reviewed_by="")  | Q(depart__startswith="D9")).exclude(
                 (Q(ac_set=1) | Q(ac_set=2)) & Q(business_type="普通采购") & ~Q(purchase_type="委托加工成品采购") 
             )
+        if req.GET.get("Q90") == "true":
+            data_obj = PurchaseOrder.objects.filter(ac_set="Q9")
+        if req.GET.get("Q9") == "true":
+            data_obj = PurchaseOrder.objects.exclude(~Q(ac_set="SGY02") & (Q(purchase_type="项目采购") | Q(purchase_type="生产采购")  | Q(purchase_type__contains="备件") | Q(pro_des__contains="备件"))
+                                                    ).exclude( Q(ac_set="SGY02"), (~Q(purchase_type="生产采购") | ~Q(business_type="普通采购") | Q(audit_date__isnull=True) | ~Q(inventory_code__in=sgy02_list) ))
+                                                   
         if condiction:
-            data_obj = PurchaseOrder.objects.filter(
-                Q(pro_batch__contains=condiction) | Q(order_code=condiction)
-            )
+            data_obj = data_obj.filter(con1)
         for i, x in zip(numbers, data_obj[start:end]):
             data.append({
                 "no": i+1,

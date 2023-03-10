@@ -5,11 +5,11 @@ layui.use(function () {
     var layer = layui.layer; //弹层
     var table = layui.table; //表格
     var $ = layui.$;
-    var path_name = location.pathname
+    var path_name = location.href;
     var path_arr = path_name.split("/")
     var path_part = path_arr[path_arr.length - 1]
 
-    var head = get_head(path_part);
+    var head = get_head(path_part.split("?")[0]);
     var data_url = "/bominterface/getData/"+path_part;
 
     render_table(data_url, head);
@@ -33,28 +33,45 @@ layui.use(function () {
         });
     };
 
-    $("#Q5").click(function(){
-        data_url = "/bominterface/getData/"+path_part + "?Q5=true";
-        render_table(data_url, head);
-    });
-
-    $("#Q4").click(function(){
-        data_url = "/bominterface/getData/"+path_part + "?Q4=true";
-        render_table(data_url, head);
-    });
-
     $("#yy_search_btn").click(function(){
-        // var condiction = $("#yy_search").val();
-        // data_url = "/bominterface/getData/"+path_part + "?con="+condiction;
-        // render_table(data_url, head);
-        $.post('/yy/search', {}, function(str){
-            layer.open({
-              type: 1,
-              content: str,
-              title: "高级检索",
+        var condiction = $("#yy_search").val();
+        data_url = "/bominterface/getData/"+path_part + "&con="+condiction;
+        render_table(data_url, head);
+        // $.post('/yy/search', {}, function(str){
+        //     layer.open({
+        //       type: 1,
+        //       content: str,
+        //       title: "高级检索",
               
-            });
-        });
-    })
+        //     });
+        // });
+    });
+
+    // $("#Q5").click(function(){
+    //     data_url = "/bominterface/getData/"+path_part + "?Q5=true";
+    //     render_table(data_url, head);
+    // });
+
+    // $("#Q4").click(function(){
+    //     data_url = "/bominterface/getData/"+path_part + "?Q4=true";
+    //     render_table(data_url, head);
+    // });
+
+    // $("#Q7").click(function(){
+    //     data_url = "/bominterface/getData/"+path_part + "?Q7=true";
+    //     render_table(data_url, head);
+    // });
+
+    // $("#Q9_0").click(function(){
+    //     data_url = "/bominterface/getData/"+path_part + "?Q90=true";
+    //     render_table(data_url, head);
+    // });
+
+    // $("#Q9").click(function(){
+    //     data_url = "/bominterface/getData/"+path_part + "?Q9=true";
+    //     render_table(data_url, head);
+    // });
+
+   
 });
   

@@ -1,4 +1,4 @@
-// import get_page from "/Home/static/js/common"
+import {render_table, get_page} from "./common.js"
 
 layui.use(function () {
     // 得到需要的内置组件
@@ -31,15 +31,6 @@ layui.use(function () {
         var product_name = $('.search-input').val();
         data_1["condiction"] = product_name;
         render_table('/product/data', data_1);
-        // if (product_name){
-            
-        //     // render_table('/product/data/' + product_name, data_1);
-        //     render_table('/product/data', data_1);
-        // }else{
-        //   // 如果搜索内容为空，返回全部数据
-        //     // render_table(data_url, data_1);
-        //     render_table('/product/data', data_1);
-        // }
     })
   
     // 执行一个 table 实例

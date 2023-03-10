@@ -347,7 +347,7 @@ class Del_load_bom:
         
         last_id = Product.objects.all().order_by("-id").first().id
         new_pro_code = "p" + str(last_id+3).rjust(12, '0')
-        Product.objects.create(product_code=new_pro_code, inventory_code=inventory_code, 
+        Product.objects.update_or_create(product_code=new_pro_code, inventory_code=inventory_code, 
             product_name=product_name, product_type=product_type, unit=unit, supply=supply, pro_system=m_system)
         return new_pro_code
         

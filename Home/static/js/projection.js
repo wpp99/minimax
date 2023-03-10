@@ -1,3 +1,6 @@
+import {render_table, get_page} from "./common.js"
+
+
 layui.use(function () {
   // 得到需要的内置组件
   var layer = layui.layer; //弹层
@@ -6,7 +9,6 @@ layui.use(function () {
   var dropdown = layui.dropdown;
   // var depart = document.getElementById('depart').innerHTML;
   var data_url = "/projection_data";
-
   // 搜索
   $('#search').click(function(){
     var depart = $("#depart_search").val();
@@ -20,11 +22,11 @@ layui.use(function () {
 
   // 添加
   $("#add_pro").click(function(){
-    get_page("/projection_add", "添加项目");
+    get_page("/projection_add", "添加项目", "/index");
   });
   
   // 执行一个 table 实例
-  render_table(data_url);
+  render_table(data_url, "项目表", "projection");
 
   // 单元格工具事件
   table.on("tool(test)", function (obj) {
@@ -68,7 +70,7 @@ layui.use(function () {
                     layer.close(index);
                   });
               } else if(menudata.id === 'edit'){
-                  get_page("/projection_edit/"+ data.id, "编辑项目");
+                  get_page("/projection_edit/"+ data.id, "编辑项目", "/index");
               }else if(menudata.id === 'output'){
                   
                   $.ajax({
@@ -88,29 +90,6 @@ layui.use(function () {
                       success: function(result, state, xhr){
                           layer.msg("导出成功");
                           window.location.href = '/b/output?pro_no='+ data.pro_no;
-                          // // console.log(xhr);
-                          // let fileName = xhr.getResponseHeader('Content-Disposition').split(';')[1].split('=')[1].replace(/\"/g, '')
-                          // let type = xhr.getResponseHeader("content-type");
-
-                          // //结果数据类型处理
-			                    // let blob = new Blob([result], { type: type });
-
-                          // let link = document.createElement("a");
-                          // link.download = fileName;
-				                  // link.style.display = "none"
-				                  // link.href = URL.createObjectURL(blob);
-
-				                  // document.body.appendChild(link);
-				                  // link.click(); //执行下载
-				                  // URL.revokeObjectURL(link.href);//释放url
-				                  // document.body.removeChild(link);//释放标签
-
-
-                          // u = document.createElement('a');
-                          // u.href = result;
-                          // document.body.append(u);
-                          // u.click();
-                          // document.body.remove(u);
                       },
                   })
               }else if(menudata.id === 'load_b'){
@@ -137,78 +116,6 @@ layui.use(function () {
         })
     }
   });
-
-  // 渲染表格
-  function render_table(url){
-    table.render({
-      elem: "#demo",
-      height: 720,
-      url: url, //数据接口（此处为静态数据，仅作演示）
-      title: "项目表",
-      page: true, //开启分页
-      limit: 20,
-      limits: [20, 30, 50, 100],
-      toolbar: "true", //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
-      defaultToolbar: ['filter', 'print', 'exports', {
-          output: '导出',
-          layEvent: "output",
-          icon: "layui-icon-down"
-      }],
-      // defaultToolbar: ['filter'],
-      totalRow: false, //开启合计行
-      loading: true,
-      cols: [
-        [
-          //表头
-          // {type: 'checkbox', fixed: 'left'},
-          { field: "id", title: "序号", width: 80, sort: true },
-          { field: "pro_no", title: "项目号", width: 150 },
-          { field: "pro_name", title: "项目名称", width: 200, sort: true },
-          { field: "depart_no", title: "部门编码", width: 80, sort: true },
-          { field: "pm", title: "项目PM", width: 85, sort: true },
-          { field: "client_no", title: "客户编码", width: 80 },
-          { field: "con_year", title: "合同年份", width: 85, sort: true },
-          { field: "con_depart", title: "合同部门位置", width: 80, sort: true },
-          { field: "pro_date", title: "日期", width: 120, sort: true },
-          { field: "pro_tec", title: "技术负责人", width: 130 },
-          { field: "pro_mer", title: "商务负责人", width: 100 },
-          { field: "client", title: "客户名称", width: 135 },
-          { field: "endUser", title: "最终用户", width: 135 },
-          { field: "pro_area", title: "项目所在地", width: 135 },
-          { field: "con_type", title: "项目类型", width: 85, sort: true },
-          { field: "sm", title: "SM", width: 85 },
-          { field: "logit_status", title: "物流是否关闭", width: 85, sort: true },
-          { field: "pro_status", title: "项目状态", width: 85, sort: true },
-          { field: "pro_label", title: "合同标签", width: 85, sort: true },
-          { fixed: "right", title: "操作", width: 180, align: "center", toolbar: "#barDemo", },
-        ],
-      ],
-    });
-  };
-
-  // 弹出层
-  function get_page(url, title){
-    $.get(url, function (str) {
-      layer.open({
-        type: 1,
-        title: title,
-        skint: "demo-class",
-        area: ["400px", "300px"],
-        offset: "auto",
-        anim: 0, //  弹出动画
-        isOutAnim: true,
-        maxmin: true,
-        resize: true,
-        // content: $('#projection_add'),
-        content: str,
-        cancel: function(index, layero){
-          layer.close(index);
-          parent.location.href = '/index';
-          return false;
-        }
-      });
-    });
-  };
 
 });
 

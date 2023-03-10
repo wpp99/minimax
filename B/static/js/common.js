@@ -79,22 +79,22 @@ export var headers = {
         { field: "m_system", title: "所属系统", width: 180 },
         { fixed: "right", title: "操作", width: 180, align: "center", toolbar: "#barDemo"},
     ],
-    "projection":[
-        { field: "id", title: "序号", width: 80, sort: true },
-        { field: "con_year", title: "合同年份", width: 80, sort: true },
-        { field: "con_depart", title: "合同部门位置", width: 80, sort: true },
-        { field: "pro_no", title: "合同号", width: 180, sort: true },
-        { field: "pro_name", title: "项目名称", width: 200, sort: true },
-        { field: "depart_no", title: "部门编码", width: 80, sort: true },
-        { field: "pm", title: "项目PM", width: 180, sort: true },
-        { field: "pro_mer", title: "商务", width: 180, sort: true },
-        { field: "con_type", title: "项目类型", width: 180, sort: true },
-        { field: "pro_label", title: "合同标签", width: 180, sort: true },
-        { field: "pro_date", title: "LX日期", width: 180, sort: true },
-        { field: "logit_status", title: "物流是否关闭", width: 180, sort: true },
-        { field: "pro_status", title: "项目状态", width: 180, sort: true },
-        { fixed: "right", title: "操作", width: 180, align: "center", toolbar: "#barDemo"},
-    ],
+    // "projection":[
+    //     { field: "id", title: "序号", width: 80, sort: true },
+    //     { field: "con_year", title: "合同年份", width: 80, sort: true },
+    //     { field: "con_depart", title: "合同部门位置", width: 80, sort: true },
+    //     { field: "pro_no", title: "合同号", width: 180, sort: true },
+    //     { field: "pro_name", title: "项目名称", width: 200, sort: true },
+    //     { field: "depart_no", title: "部门编码", width: 80, sort: true },
+    //     { field: "pm", title: "项目PM", width: 180, sort: true },
+    //     { field: "pro_mer", title: "商务", width: 180, sort: true },
+    //     { field: "con_type", title: "项目类型", width: 180, sort: true },
+    //     { field: "pro_label", title: "合同标签", width: 180, sort: true },
+    //     { field: "pro_date", title: "LX日期", width: 180, sort: true },
+    //     { field: "logit_status", title: "物流是否关闭", width: 180, sort: true },
+    //     { field: "pro_status", title: "项目状态", width: 180, sort: true },
+    //     { fixed: "right", title: "操作", width: 180, align: "center", toolbar: "#barDemo"},
+    // ],
     "guan":[
         { field: "no", title: "序号", width: 80, sort: true,  align: "center" },
         { field: "manage_code", title: "管理单号", width: 80, sort: true,  align: "center" },
@@ -200,6 +200,7 @@ export var headers = {
         { field: "reviewed_by", title: "审核人", width: 80, sort: true,  align: "center" },
         { field: "audit_date", title: "审核时间", width: 180, sort: true,  align: "center" },
         { field: "out_type", title: "出库类型", width: 180, sort: true,  align: "center" },
+        { field: "srd_pro_code", title: "srd产品编号", width: 180, sort: true,  align: "center" },
         { fixed: "right", title: "操作",  align: "center", toolbar: "#barDemo", width: 180},
     ],
     "bom_sum":[
@@ -209,6 +210,30 @@ export var headers = {
         { field: "pro_sys_bc", title: "项目号|系统|批次",  width: 1300, sort: true,  align: "center" },
         { field: "submit_date", title: "提交日期",  width: 120, sort: true,  align: "center" },
         { fixed: "right", title: "操作",  align: "center", toolbar: "#barDemo", width: 180},
+    ],
+    "projection":[
+        // {type: 'checkbox', fixed: 'left'},
+        { field: "no", title: "序号", width: 70 },
+        { field: "pro_no", title: "项目号", width: 150 },
+        { field: "pro_name", title: "项目名称", width: 200, sort: true },
+        { field: "depart_no", title: "部门编码", width: 80, sort: true },
+        { field: "pm", title: "项目PM", width: 85, sort: true },
+        { field: "client_no", title: "客户编码", width: 80 },
+        { field: "con_year", title: "合同年份", width: 85, sort: true },
+        { field: "con_depart", title: "合同部门位置", width: 80, sort: true },
+        { field: "pro_date", title: "日期", width: 120, sort: true },
+        { field: "pro_tec", title: "技术负责人", width: 130 },
+        { field: "pro_mer", title: "商务负责人", width: 100 },
+        { field: "client", title: "客户名称", width: 135 },
+        { field: "endUser", title: "最终用户", width: 135 },
+        { field: "pro_area", title: "项目所在地", width: 135 },
+        { field: "con_type", title: "项目类型", width: 85, sort: true },
+        { field: "sm", title: "SM", width: 85 },
+        { field: "logit_status", title: "物流是否关闭", width: 85, sort: true },
+        { field: "pro_status", title: "项目状态", width: 85, sort: true },
+        { field: "pro_label", title: "合同标签", width: 85, sort: true },
+        { field: "id", title: "ID", width: 80, sort: true },
+        { fixed: "right", title: "操作", width: 180, align: "center", toolbar: "#barDemo", },
     ],
 };
 
@@ -333,4 +358,57 @@ export var header_map = {
     "be_sum": "安装量量合计",
     "be_loss": "损失量",
     "be_bb": "安装设计比较",
+};
+
+// 渲染表格
+export function render_table(url, title, head_key){
+    var head = headers[head_key];
+    var table = layui.table;
+    table.render({
+        elem: "#demo",
+        // height: height,
+        url: url, //数据接口（此处为静态数据，仅作演示）
+        title: title,
+        skin: "line",
+        even: true,
+        page: true, //开启分页
+        limit: 20,
+        limits: [20, 30, 50, 100],
+        toolbar: "true", //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+        defaultToolbar: ['filter', 'print', 'exports', {
+            output: '导出',
+            layEvent: "output",
+            icon: "layui-icon-down"
+        }],
+        // defaultToolbar: ['filter'],
+        totalRow: false, //开启合计行
+        loading: true,
+        cols: [head],
+    })
+};
+
+// 弹出层
+export function get_page(url, title, cancel_url){
+    var layer = layui.layer;
+    var $ = layui.$;
+    $.get(url, function (str) {
+        layer.open({
+            type: 1,
+            title: title,
+            skint: "demo-class",
+            area: ["400px", "300px"],
+            offset: "auto",
+            anim: 0, //  弹出动画
+            isOutAnim: true,
+            maxmin: true,
+            resize: true,
+            // content: $('#projection_add'),
+            content: str,
+            cancel: function(index, layero){
+                layer.close(index);
+                parent.location.href = cancel_url;
+                return false;
+            }
+        });
+    });
 };

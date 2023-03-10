@@ -21,12 +21,14 @@ def get_pro_data(req, depart=None):
     page = int(req.GET.get("page"))
     start = (page - 1) * limit
     end = page * limit
+    number = [*range(start, end)]
     if depart:
         data_obj = Projection.objects.filter(Q(depart_no__startswith=depart) | Q(pro_no=depart))
     else:
         data_obj = Projection.objects.all()
     data = [{
         'id': x.id,
+        'no': i + 1,
         'pro_no': x.pro_no, 
         'pro_name': x.pro_name,
         'depart_no': x.depart_no, 
@@ -45,7 +47,7 @@ def get_pro_data(req, depart=None):
         'sm': x.sm, 
         'pro_status': x.pro_status,
         'pro_label': x.pro_label
-    } for x in data_obj[start:end]]
+    } for i, x in zip(number, data_obj[start:end])]
     content = {
         'code': 0,
         'msg': '',

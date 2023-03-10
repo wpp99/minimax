@@ -8,6 +8,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" type="image/x-icon" href="{% static 'imgs/favicon.ico' %}">
         <link rel="stylesheet" href="{% static 'plugins/layui/css/layui.css' %}">
+        <style>
+            .layui-layout-admin .layui-body{
+                padding-bottom: 15px;
+            }
+        </style>
         <title>minimax_b</title>
     </head>
 
@@ -111,9 +116,14 @@
                                 <dd><a href="/bominterface/sjXqdall">sjXQDALL</a></dd>
                                 <dd><a href="/bominterface/bom_all?page=1&limit=10&bom=all">bom汇总</a></dd>
                                 <!-- <dd><a href="/bominterface/yongyou">用友</a></dd> -->
-                                <dd><a href="/yy/warehouse">现存量</a></dd>
-                                <dd><a href="/yy/purchase">采购订单</a></dd>
-                                <dd><a href="/yy/sale_out">销售出库</a></dd>
+                                <dd><a href="/yy/warehouse?">现存量</a></dd>
+                                <dd><a href="/yy/warehouse?Q7=true">Q7</a></dd>
+                                <dd><a href="/yy/purchase?">采购订单</a></dd>
+                                <dd><a href="/yy/purchase?Q4=true">Q4</a></dd>
+                                <dd><a href="/yy/purchase?Q90=true">Q9原始</a></dd>
+                                <dd><a href="/yy/purchase?Q9=true">Q9</a></dd>
+                                <dd><a href="/yy/sale_out?">销售出库</a></dd>
+                                <dd><a href="/yy/sale_out?Q5=true">Q5</a></dd>
                                 <dd><a href="/bominterface/batch_compart">批次对比表</a></dd>
                                 <dd><a href="/guan">固安</a></dd>
                                 <dd><a href="/bominterface/material_out">材料出库单列表</a></dd>
@@ -130,9 +140,9 @@
                 <iframe src="/projection" width="100%" scrolling="yes" height="100%" style="z-index: 1;" frameborder="0"></iframe>
             </div>
 
-            <div class="layui-footer">
+            <!-- <div class="layui-footer">
                 底部固定区域
-            </div>
+            </div> -->
         </div>
         <script src="{% static 'plugins/layui/layui.js' %}"></script>
         <script src="{% static 'plugins/jquery-3.6.3.min.js' %}"></script>
@@ -141,6 +151,7 @@
                 e.preventDefault();
                 $('iframe').attr('src', $(this).attr('href'));
             });
+            
         </script>
     </body>
 </html>

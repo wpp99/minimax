@@ -172,10 +172,14 @@ class Del_load_upload:
             if sheet in bom_name:
                 data_contain = pd.read_excel(self.data_obj, sheet_name=sheet, header=7)
                 # data_contain = pd.concat([data_contain, d])
-                data_contain = data_contain[data_contain["MX Art. No."].map(str).str.contains('\d{5,15}')]
+                data_contain = data_contain[data_contain["MX Art. No."].map(str).str.contains('\d{5,20}')]
                 data_contain = data_contain.fillna('')
                 for index, row in data_contain.iterrows():
-                    product_code = 'p' + str(j).rjust(9, '0')
+                    product_code = Del_load_bom().make_product_code(str(row["MX Art. No."]), 
+                                                     row["Unit\n单位"], row["Goods Description(external)\n货物描述（对外）"], 
+                                                     row["Specification(internal)\n规格（对内）"], 
+                                                     row["Supplier\n供应商"], 
+                                                     bom_map[sheet])
                     data.append({
                         "id": index,
                         "product_code" : product_code,
@@ -307,12 +311,12 @@ class Del_load_upload:
         excel_file = pd.read_excel(self.data_obj)
         excel_file = excel_file[excel_file["业务类型"].notna()]
         excel_file["数量"].fillna(0, inplace=True)
-        excel_file["累计入库数量"].fillna(0, inplace=True)
+        # excel_file["累计入库数量"].fillna(0, inplace=True)
         # excel_file["cum_towarehouse_num"].fillna(0, inplace=True)
         excel_file.fillna("", inplace=True)
         for index, row in excel_file.iterrows():
-            if not row["存货编号"].startswith("000000000"):
-                product_code = Del_load_bom().make_product_code(row["存货编号"], row["主计量"], row["存货名称"], row["规格型号"], None, None)
+            if not str(row["存货编码"]).startswith("000000000"):
+                product_code = Del_load_bom().make_product_code(row["存货编码"], row["主计量"], row["存货名称"], row["规格型号"], None, None)
             else:
                 product_code = ""
             self.data.append({
@@ -321,7 +325,7 @@ class Del_load_upload:
                 "business_type": row["业务类型"],
                 "purchase_type": row["采购类型"],
                 "order_code": row["订单编号"],
-                "inventory_code": row["存货编号"],
+                "inventory_code": row["存货编码"],
                 "purchase_num": row["数量"],
                 "upper_order_code": row["上游单据号"],
                 "prepared_by": row["制单人"],
@@ -330,13 +334,13 @@ class Del_load_upload:
                 "audit_date": self.del_date(row["审核时间"]),
                 "arrive_date": self.del_date(row["计划到货日期"]),
                 "remark": row["行备注"],
-                "pro_batch": row["项目DY批次号"],
+                "pro_batch": row["DY批次号"],
                 "depart": row["部门"],
                 "warehouse_status": row["入库状态"],
                 "pro_des": row["项目描述"],
                 "arrive_status": row["到货状态"],
                 "drictship": row["直运至"],
-                "cum_towarehouse_num": row["累计入库数量"],
+                # "cum_towarehouse_num": row["累计入库数量"],
             })
         return self.data
 
@@ -364,6 +368,8 @@ class Del_load_upload:
                 "out_date": self.del_date(row["出库日期"]),
                 "audit_date": self.del_date(row["审核时间"]),
                 "out_type": row["出库类别"],
+                "srd_pro_code": row["产品编号"],
+                "ac_set": row["账套"],
             })
         return self.data 
 
@@ -600,9 +606,31 @@ class Del_load_upload:
         Inventory.objects.all().delete()
         obj_list = []
         for data_item in dd:
-
             i_obj = Inventory(**data_item)
             obj_list.append(i_obj)
+        sale_sgy02_obj = SaleOutInventory.objects.filter(ac_set="SGY02")
+        sgy02_list = [p_obj.inventory_code for p_obj in Product.objects.filter(pro_system=2)]
+        guan_list = []
+        for sgy02_obj in sale_sgy02_obj:
+            srd_pro_code = sgy02_obj.srd_pro_code
+            if srd_pro_code:
+                guan_obj = Guan.objects.filter(product_code=srd_pro_code).first()
+                if guan_obj:
+                    if guan_obj.status == "在建" or guan_obj.status == "待建":
+                        guan_list.append(sgy02_obj.inventory_code)
+        sale_sgy02_obj = sale_sgy02_obj.filter(Q(inventory_code__in=sgy02_list) | Q(inventory_code__in=guan_list))
+        for item in sale_sgy02_obj:
+            product_obj = Product.objects.filter(inventory_code = item.inventory_code).first()
+            product_name = product_obj.product_name
+            product_code = product_obj.product_code
+            inven_obj = Inventory(
+                warehouse_name =  "销售出库单列表SGY02",
+                inventory_code = item.inventory_code,
+                inven_now_num =  item.out_num,
+                inventory_name= product_name,
+                product_code = product_code,
+            )
+            obj_list.append(inven_obj)
         Inventory.objects.bulk_create(obj_list)
 
     def load_purchase(self, data):
